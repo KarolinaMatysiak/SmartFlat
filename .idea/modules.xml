@@ -2,7 +2,8 @@
 <project version="4">
   <component name="ProjectModuleManager">
     <modules>
-      <module fileurl="file://$PROJECT_DIR$/.idea/SmartFlat.iml" filepath="$PROJECT_DIR$/.idea/SmartFlat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/smart_flat.iml" filepath="$PROJECT_DIR$/smart_flat.iml" />
+      <module fileurl="file://$PROJECT_DIR$/android/smart_flat_android.iml" filepath="$PROJECT_DIR$/android/smart_flat_android.iml" />
     </modules>
   </component>
 </project>
