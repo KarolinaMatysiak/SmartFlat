@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "356142583978",
+    "project_id": "smart-flat-18af0",
+    "storage_bucket": "smart-flat-18af0.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:356142583978:android:581115f4fddddf3be980d3",
+        "android_client_info": {
+          "package_name": "com.example.smart_flat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBUFmuqregXDYEu7wSL6SY_rdic_S28Phw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
