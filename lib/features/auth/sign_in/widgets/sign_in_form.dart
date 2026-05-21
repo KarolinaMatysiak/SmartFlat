@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_input.dart';
 import 'package:smart_flat/features/auth/common/services/auth_service.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_form_logo.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_input_email.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_input_password.dart';
-import 'package:smart_flat/features/auth/sign_in/widgets/sign_in_button.dart';
+import 'package:smart_flat/features/auth/common/widgets/auth_email_input.dart';
+import 'package:smart_flat/features/auth/common/widgets/auth_password_input.dart';
+import 'package:smart_flat/features/auth/common/widgets/auth_form_submit_button.dart';
+import 'package:smart_flat/features/auth/gate/auth_gate.dart';
 import 'package:smart_flat/features/auth/sign_up/screens/sign_up_screen.dart';
 import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
 
@@ -33,6 +34,10 @@ class _SignInForm extends State<SignInForm> {
       await AuthService.signIn(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
+      );
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthGate()),
+            (route) => false,
       );
     } catch (e) {
       if (!mounted) {
@@ -82,15 +87,15 @@ class _SignInForm extends State<SignInForm> {
 
               const SizedBox(height: 24),
 
-              AuthInputEmail(controller: emailController),
+              AuthEmailInput(controller: emailController),
 
               const SizedBox(height: 14),
 
-              AuthInputPassword(controller: passwordController),
+              AuthPasswordInput(controller: passwordController),
 
               const SizedBox(height: 22),
 
-              SignInButton(loading: loading, onPressed: signIn),
+              AuthFormSubmitButton(loading: loading, onPressed: signIn),
 
               const SizedBox(height: 22),
 
@@ -100,7 +105,7 @@ class _SignInForm extends State<SignInForm> {
                   const Text("Don't have an account?"),
                   TextButton(
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pushReplacement(
                         context,
                         MaterialPageRoute(builder: (_) => const SignUpScreen()),
                       );

@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_form_logo.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_input.dart';
 import 'package:smart_flat/features/auth/common/services/auth_service.dart';
+import 'package:smart_flat/features/auth/common/widgets/auth_email_input.dart';
+import 'package:smart_flat/features/auth/common/widgets/auth_password_input.dart';
+import 'package:smart_flat/features/auth/gate/auth_gate.dart';
 import 'package:smart_flat/features/auth/sign_in/screens/sign_in_screen.dart';
-import 'package:smart_flat/features/auth/sign_in/widgets/sign_in_button.dart';
+import 'package:smart_flat/features/auth/common/widgets/auth_form_submit_button.dart';
+import 'package:smart_flat/features/auth/sign_up/widgets/auth_password_confirm_input.dart';
+import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
 
 class SignUpForm extends StatefulWidget {
   const SignUpForm({super.key});
@@ -13,26 +17,38 @@ class SignUpForm extends StatefulWidget {
 }
 
 class _SignUpForm extends State<SignUpForm> {
+  final _formKey = GlobalKey<FormState>();
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
+  final passwordConfirmationController = TextEditingController();
 
   bool loading = false;
 
-  Future<void> login() async {
+  Future<void> signUp() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) return;
+
     setState(() => loading = true);
 
     try {
-      await AuthService.signIn(
+      await AuthService.signUp(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthGate()),
+            (route) => false,
+      );
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (!mounted) {
+        return;
+      }
+      showErrorSnackBar(context, "Cannot create user");
     } finally {
-      if (mounted) setState(() => loading = false);
+      if (mounted) {
+        setState(() => loading = false);
+      }
     }
   }
 
@@ -40,6 +56,7 @@ class _SignUpForm extends State<SignUpForm> {
   void dispose() {
     emailController.dispose();
     passwordController.dispose();
+    passwordConfirmationController.dispose();
     super.dispose();
   }
 
@@ -52,72 +69,61 @@ class _SignUpForm extends State<SignUpForm> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const AuthFormLogo(icon: Icons.account_circle),
-            const SizedBox(height: 20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const AuthFormLogo(icon: Icons.account_circle),
+              const SizedBox(height: 20),
 
-            Text("Sign Up", style: Theme.of(context).textTheme.headlineSmall),
+              Text("Sign Up", style: Theme.of(context).textTheme.headlineSmall),
 
-            const SizedBox(height: 6),
+              const SizedBox(height: 6),
 
-            Text(
-              "Enter Smart Flat World",
-              style: TextStyle(color: cs.onSurface.withOpacity(0.6)),
-            ),
+              Text(
+                "Enter Smart Flat World",
+                style: TextStyle(color: cs.onSurface.withOpacity(0.6)),
+              ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            AuthInput(
-              controller: emailController,
-              icon: Icons.email_outlined,
-              label: "Email",
-              obscure: false,
-            ),
+              AuthEmailInput(controller: emailController),
 
-            const SizedBox(height: 14),
+              const SizedBox(height: 14),
 
-            AuthInput(
-              controller: passwordController,
-              icon: Icons.lock_outline,
-              label: "Password",
-              obscure: true,
-            ),
+              AuthPasswordInput(controller: passwordController),
 
-            const SizedBox(height: 14),
+              const SizedBox(height: 14),
 
-            AuthInput(
-              controller: passwordController,
-              icon: Icons.lock_outline,
-              label: "Password Confirmation",
-              obscure: true,
-            ),
+              AuthPasswordConfirmInput(
+                passwordController: passwordController,
+                passwordConfirmationController: passwordConfirmationController,
+              ),
 
-            const SizedBox(height: 22),
+              const SizedBox(height: 22),
 
-            SignInButton(loading: loading, onPressed: login),
+              AuthFormSubmitButton(loading: loading, onPressed: signUp),
 
-            const SizedBox(height: 22),
+              const SizedBox(height: 22),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Already have an account?"),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SignInScreen(),
-                      ),
-                    );
-                  },
-                  child: Text("Sign In"),
-                ),
-              ],
-            ),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text("Already have an account?"),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (_) => const SignInScreen()),
+                      );
+                    },
+                    child: Text("Sign In"),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

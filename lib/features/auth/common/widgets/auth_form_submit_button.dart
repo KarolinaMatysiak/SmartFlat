@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class SignInButton extends StatelessWidget {
+class AuthFormSubmitButton extends StatelessWidget {
   final bool loading;
   final VoidCallback onPressed;
 
-  const SignInButton({
+  const AuthFormSubmitButton({
     super.key,
     required this.loading,
     required this.onPressed,

@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_input.dart';
 
-class AuthInputEmail extends StatelessWidget {
+class AuthEmailInput extends StatelessWidget {
   final TextEditingController controller;
 
-  const AuthInputEmail({super.key, required this.controller});
+  const AuthEmailInput({super.key, required this.controller});
 
   @override
   Widget build(BuildContext context) {
