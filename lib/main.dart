@@ -2,14 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'firebase_options.dart';
+import 'features/auth/sign_in/screens/sign_in_page.dart';
+import 'infrastructure/firebase/firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   runApp(const MyApp());
 }
@@ -20,11 +19,57 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Affirmations App',
+      title: 'Smart Flat',
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
+
+        colorScheme: const ColorScheme(
+          brightness: Brightness.light,
+          primary: Color(0xFF7C3AED),
+          // deep purple
+          onPrimary: Colors.white,
+
+          secondary: Color(0xFF22D3EE),
+          // cyan accent
+          onSecondary: Colors.black,
+
+          tertiary: Color(0xFFFB7185),
+
+          // soft pink accent
+          surface: Color(0xFFF8FAFC),
+          // very light gray-blue
+          onSurface: Color(0xFF0F172A),
+
+          // dark slate
+          error: Color(0xFFEF4444),
+
+          onError: Colors.white,
+
+          outline: Color(0xFFE2E8F0),
+          shadow: Color(0x1A000000),
+        ),
+
+        textTheme: const TextTheme(
+          headlineSmall: TextStyle(fontWeight: FontWeight.w700),
+        ),
+
+        scaffoldBackgroundColor: const Color(0xFFF1F5F9),
+
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.white,
+          elevation: 0,
+          centerTitle: false,
+          foregroundColor: Colors.black,
+        ),
+
+        cardTheme: CardThemeData(
+          elevation: 0,
+          color: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
       ),
       home: const AuthGate(),
     );
@@ -50,83 +95,8 @@ class AuthGate extends StatelessWidget {
           return const MyHomePage(title: "My Affirmations");
         }
 
-        return const LoginPage();
+        return SignInPage();
       },
-    );
-  }
-}
-
-/// ---------------- LOGIN ----------------
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({super.key});
-
-  @override
-  State<LoginPage> createState() => _LoginPageState();
-}
-
-class _LoginPageState extends State<LoginPage> {
-  final emailController = TextEditingController();
-  final passwordController = TextEditingController();
-
-  bool loading = false;
-
-  Future<void> login() async {
-    try {
-      setState(() => loading = true);
-
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: emailController.text.trim(),
-        password: passwordController.text.trim(),
-      );
-    } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message ?? "Login error")),
-      );
-    } finally {
-      setState(() => loading = false);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(title: const Text("Login")),
-      body: Padding(
-        padding: const EdgeInsets.all(20),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            TextField(
-              controller: emailController,
-              decoration: const InputDecoration(
-                labelText: "Email",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 16),
-            TextField(
-              controller: passwordController,
-              obscureText: true,
-              decoration: const InputDecoration(
-                labelText: "Password",
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              height: 50,
-              child: ElevatedButton(
-                onPressed: loading ? null : login,
-                child: loading
-                    ? const CircularProgressIndicator()
-                    : const Text("Login"),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
@@ -149,7 +119,7 @@ class MyHomePage extends StatelessWidget {
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () => FirebaseAuth.instance.signOut(),
-          )
+          ),
         ],
       ),
       body: StreamBuilder<QuerySnapshot>(
@@ -174,13 +144,8 @@ class MyHomePage extends StatelessWidget {
               final data = docs[index].data() as Map<String, dynamic>;
 
               return Card(
-                margin: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                child: ListTile(
-                  title: Text(data['title'] ?? ''),
-                ),
+                margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                child: ListTile(title: Text(data['title'] ?? '')),
               );
             },
           );
