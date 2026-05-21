@@ -1,7 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 
 class AuthService {
-  static Future<void> login({
+  static Future<void> signIn({
     required String email,
     required String password,
   }) async {
@@ -11,7 +11,7 @@ class AuthService {
     );
   }
 
-  static Future<void> logout() async {
+  static Future<void> logOut() async {
     await FirebaseAuth.instance.signOut();
   }
 }

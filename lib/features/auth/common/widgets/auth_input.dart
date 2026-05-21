@@ -5,6 +5,7 @@ class AuthInput extends StatelessWidget {
   final IconData icon;
   final String label;
   final bool obscure;
+  final String? Function(String?)? validator;
 
   const AuthInput({
     super.key,
@@ -12,15 +13,17 @@ class AuthInput extends StatelessWidget {
     required this.icon,
     required this.label,
     required this.obscure,
+    this.validator,
   });
 
   @override
   Widget build(BuildContext context) {
     final cs = Theme.of(context).colorScheme;
 
-    return TextField(
+    return TextFormField(
       controller: controller,
       obscureText: obscure,
+      validator: validator,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, color: cs.primary),

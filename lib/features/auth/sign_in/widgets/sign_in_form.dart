@@ -2,8 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_input.dart';
 import 'package:smart_flat/features/auth/common/services/auth_service.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_form_logo.dart';
+import 'package:smart_flat/features/auth/common/widgets/auth_input_email.dart';
+import 'package:smart_flat/features/auth/common/widgets/auth_input_password.dart';
 import 'package:smart_flat/features/auth/sign_in/widgets/sign_in_button.dart';
 import 'package:smart_flat/features/auth/sign_up/screens/sign_up_screen.dart';
+import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
 
 class SignInForm extends StatefulWidget {
   const SignInForm({super.key});
@@ -13,26 +16,34 @@ class SignInForm extends StatefulWidget {
 }
 
 class _SignInForm extends State<SignInForm> {
+  final _formKey = GlobalKey<FormState>();
+
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
   bool loading = false;
 
-  Future<void> login() async {
+  Future<void> signIn() async {
+    final isValid = _formKey.currentState!.validate();
+    if (!isValid) return;
+
     setState(() => loading = true);
 
     try {
-      await AuthService.login(
+      await AuthService.signIn(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
     } catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.toString())));
+      if (!mounted) {
+        return;
+      }
+
+      showErrorSnackBar(context, "Invalid credentials");
     } finally {
-      if (mounted) setState(() => loading = false);
+      if (mounted) {
+        setState(() => loading = false);
+      }
     }
   }
 
@@ -52,66 +63,54 @@ class _SignInForm extends State<SignInForm> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
       child: Padding(
         padding: const EdgeInsets.all(24),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const AuthFormLogo(icon: Icons.lock),
-            const SizedBox(height: 20),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const AuthFormLogo(icon: Icons.lock),
+              const SizedBox(height: 20),
 
-            Text(
-              "Sign In",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+              Text("Sign In", style: Theme.of(context).textTheme.headlineSmall),
 
-            const SizedBox(height: 6),
+              const SizedBox(height: 6),
 
-            Text(
-              "Enter Smart Flat World",
-              style: TextStyle(color: cs.onSurface.withOpacity(0.6)),
-            ),
+              Text(
+                "Enter Smart Flat World",
+                style: TextStyle(color: cs.onSurface.withOpacity(0.6)),
+              ),
 
-            const SizedBox(height: 24),
+              const SizedBox(height: 24),
 
-            AuthInput(
-              controller: emailController,
-              icon: Icons.email_outlined,
-              label: "Email",
-              obscure: false,
-            ),
+              AuthInputEmail(controller: emailController),
 
-            const SizedBox(height: 14),
+              const SizedBox(height: 14),
 
-            AuthInput(
-              controller: passwordController,
-              icon: Icons.lock_outline,
-              label: "Password",
-              obscure: true,
-            ),
+              AuthInputPassword(controller: passwordController),
 
-            const SizedBox(height: 22),
+              const SizedBox(height: 22),
 
-            SignInButton(loading: loading, onPressed: login),
+              SignInButton(loading: loading, onPressed: signIn),
 
-            const SizedBox(height: 22),
+              const SizedBox(height: 22),
 
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text("Don't have an account?"),
-                TextButton(
-                  onPressed: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => const SignUpScreen(),
-                      ),
-                    );
-                  },
-                  child: Text("Sign Up"),
-                ),
-              ],
-            ),
-          ],
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text("Don't have an account?"),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const SignUpScreen()),
+                      );
+                    },
+                    child: const Text("Sign Up"),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

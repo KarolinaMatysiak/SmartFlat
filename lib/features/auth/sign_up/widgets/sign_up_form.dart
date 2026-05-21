@@ -22,7 +22,7 @@ class _SignUpForm extends State<SignUpForm> {
     setState(() => loading = true);
 
     try {
-      await AuthService.login(
+      await AuthService.signIn(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
       );
