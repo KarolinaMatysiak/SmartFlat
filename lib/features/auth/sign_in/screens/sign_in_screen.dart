@@ -2,8 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_background.dart';
 import 'package:smart_flat/features/auth/sign_in/widgets/sign_in_form.dart';
 
-class SignInPage extends StatelessWidget {
-  const SignInPage({super.key});
+class SignInScreen extends StatelessWidget {
+  const SignInScreen({super.key});
 
   @override
   Widget build(BuildContext context) {

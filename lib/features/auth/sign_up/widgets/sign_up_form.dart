@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
+import 'package:smart_flat/features/auth/common/widgets/auth_form_logo.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_input.dart';
 import 'package:smart_flat/features/auth/common/services/auth_service.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_form_logo.dart';
+import 'package:smart_flat/features/auth/sign_in/screens/sign_in_screen.dart';
 import 'package:smart_flat/features/auth/sign_in/widgets/sign_in_button.dart';
-import 'package:smart_flat/features/auth/sign_up/screens/sign_up_screen.dart';
 
-class SignInForm extends StatefulWidget {
-  const SignInForm({super.key});
+class SignUpForm extends StatefulWidget {
+  const SignUpForm({super.key});
 
   @override
-  State<SignInForm> createState() => _SignInForm();
+  State<SignUpForm> createState() => _SignUpForm();
 }
 
-class _SignInForm extends State<SignInForm> {
+class _SignUpForm extends State<SignUpForm> {
   final emailController = TextEditingController();
   final passwordController = TextEditingController();
 
@@ -55,13 +55,10 @@ class _SignInForm extends State<SignInForm> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const AuthFormLogo(icon: Icons.lock),
+            const AuthFormLogo(icon: Icons.account_circle),
             const SizedBox(height: 20),
 
-            Text(
-              "Sign In",
-              style: Theme.of(context).textTheme.headlineSmall,
-            ),
+            Text("Sign Up", style: Theme.of(context).textTheme.headlineSmall),
 
             const SizedBox(height: 6),
 
@@ -88,6 +85,15 @@ class _SignInForm extends State<SignInForm> {
               obscure: true,
             ),
 
+            const SizedBox(height: 14),
+
+            AuthInput(
+              controller: passwordController,
+              icon: Icons.lock_outline,
+              label: "Password Confirmation",
+              obscure: true,
+            ),
+
             const SizedBox(height: 22),
 
             SignInButton(loading: loading, onPressed: login),
@@ -97,17 +103,17 @@ class _SignInForm extends State<SignInForm> {
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text("Don't have an account?"),
+                Text("Already have an account?"),
                 TextButton(
                   onPressed: () {
                     Navigator.push(
                       context,
                       MaterialPageRoute(
-                        builder: (_) => const SignUpScreen(),
+                        builder: (_) => const SignInScreen(),
                       ),
                     );
                   },
-                  child: Text("Sign Up"),
+                  child: Text("Sign In"),
                 ),
               ],
             ),

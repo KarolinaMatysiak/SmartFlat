@@ -1,7 +1,12 @@
 import 'package:flutter/material.dart';
 
-class SignInLogo extends StatelessWidget {
-  const SignInLogo({super.key});
+class AuthFormLogo extends StatelessWidget {
+  final IconData icon;
+
+  const AuthFormLogo({
+    super.key,
+    required this.icon
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -12,14 +17,9 @@ class SignInLogo extends StatelessWidget {
       height: 64,
       decoration: BoxDecoration(
         shape: BoxShape.circle,
-        gradient: LinearGradient(
-          colors: [cs.primary, cs.secondary],
-        ),
+        gradient: LinearGradient(colors: [cs.primary, cs.secondary]),
       ),
-      child: const Icon(
-        Icons.lock,
-        color: Colors.white,
-      ),
+      child: Icon(icon, color: Colors.white),
     );
   }
 }
