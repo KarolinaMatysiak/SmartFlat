@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_input.dart';
+import 'package:smart_flat/core/widgets/form_input.dart';
 
 class AuthEmailInput extends StatelessWidget {
   final TextEditingController controller;
@@ -8,7 +8,7 @@ class AuthEmailInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AuthInput(
+    return FormInput(
       controller: controller,
       icon: Icons.email_outlined,
       label: "Email",

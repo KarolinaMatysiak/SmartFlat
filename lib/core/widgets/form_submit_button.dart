@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-class AuthFormSubmitButton extends StatelessWidget {
+class FormSubmitButton extends StatelessWidget {
   final bool loading;
   final VoidCallback onPressed;
 
-  const AuthFormSubmitButton({
+  const FormSubmitButton({
     super.key,
     required this.loading,
     required this.onPressed,

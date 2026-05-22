@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_input.dart';
+import 'package:smart_flat/core/widgets/form_input.dart';
 
 class AuthPasswordConfirmInput extends StatelessWidget {
   final TextEditingController passwordController;
@@ -13,7 +13,7 @@ class AuthPasswordConfirmInput extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AuthInput(
+    return FormInput(
       controller: passwordConfirmationController,
       icon: Icons.lock_outline,
       label: "Confirm Password",

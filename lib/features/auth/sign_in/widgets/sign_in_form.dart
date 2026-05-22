@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_input.dart';
+import 'package:smart_flat/core/widgets/form_input.dart';
 import 'package:smart_flat/features/auth/common/services/auth_service.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_form_logo.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_email_input.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_password_input.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_form_submit_button.dart';
+import 'package:smart_flat/core/widgets/form_submit_button.dart';
 import 'package:smart_flat/features/auth/gate/auth_gate.dart';
 import 'package:smart_flat/features/auth/sign_up/screens/sign_up_screen.dart';
 import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
@@ -95,7 +95,7 @@ class _SignInForm extends State<SignInForm> {
 
               const SizedBox(height: 22),
 
-              AuthFormSubmitButton(loading: loading, onPressed: signIn),
+              FormSubmitButton(loading: loading, onPressed: signIn),
 
               const SizedBox(height: 22),
 

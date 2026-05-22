@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_background.dart';
+import 'package:smart_flat/core/widgets/app_background.dart';
 import 'package:smart_flat/features/auth/sign_up/widgets/sign_up_form.dart';
 
 class SignUpScreen extends StatelessWidget {
@@ -8,7 +8,7 @@ class SignUpScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: AuthBackground(
+      body: AppBackground(
         child: Center(
           child: ConstrainedBox(
             constraints: BoxConstraints(maxWidth: 420),

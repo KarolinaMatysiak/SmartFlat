@@ -5,7 +5,7 @@ import 'package:smart_flat/features/auth/common/widgets/auth_email_input.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_password_input.dart';
 import 'package:smart_flat/features/auth/gate/auth_gate.dart';
 import 'package:smart_flat/features/auth/sign_in/screens/sign_in_screen.dart';
-import 'package:smart_flat/features/auth/common/widgets/auth_form_submit_button.dart';
+import 'package:smart_flat/core/widgets/form_submit_button.dart';
 import 'package:smart_flat/features/auth/sign_up/widgets/auth_password_confirm_input.dart';
 import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
 
@@ -103,7 +103,7 @@ class _SignUpForm extends State<SignUpForm> {
 
               const SizedBox(height: 22),
 
-              AuthFormSubmitButton(loading: loading, onPressed: signUp),
+              FormSubmitButton(loading: loading, onPressed: signUp),
 
               const SizedBox(height: 22),
 

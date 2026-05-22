@@ -1,31 +1,35 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:smart_flat/features/auth/common/services/auth_service.dart';
+import 'package:smart_flat/features/auth/gate/auth_gate.dart';
 
 class HomeScreen extends StatelessWidget {
-  static const routeName = '/';
-
   const HomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final user = FirebaseAuth.instance.currentUser;
+    final user = AuthService.getCurrentUser();
 
     if (user == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
-      );
+      return const Scaffold(body: Center(child: CircularProgressIndicator()));
     }
 
     final userId = user.uid;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text("AAA"),
+        title: Text("Home"),
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => FirebaseAuth.instance.signOut(),
+            onPressed: () => {
+              AuthService.signOut(),
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (_) => const AuthGate()),
+                (route) => false,
+              ),
+            },
           ),
         ],
       ),

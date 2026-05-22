@@ -2,7 +2,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:smart_flat/features/auth/sign_in/screens/sign_in_screen.dart';
-import 'package:smart_flat/features/home/screens/home_screen.dart';
+import 'package:smart_flat/features/onboarding/screens/user_profile_onboarding_screen.dart';
 
 class AuthGate extends StatelessWidget {
   const AuthGate({super.key});
@@ -19,7 +19,7 @@ class AuthGate extends StatelessWidget {
         }
 
         if (snapshot.hasData) {
-          return const HomeScreen();
+          return const UserProfileOnboardingScreen();
         }
 
         return SignInScreen();
