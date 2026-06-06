@@ -12,7 +12,7 @@ class UserProfileService {
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
   Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile(String identityId) {
-    return firestore.collection('usersProfiles').doc(identityId).get();
+    return firestore.collection('userProfiles').doc(identityId).get();
   }
 
   Future<void> createUserProfile({
@@ -20,10 +20,14 @@ class UserProfileService {
     required String firstName,
     required String userName,
   }) async {
-    await firestore.collection('usersProfiles').doc(identityId).set({
-      'firstName': firstName,
-      'userName': userName,
-      'createdAt': FieldValue.serverTimestamp(),
-    });
+    await firestore.collection('userProfiles').doc(identityId).set(
+      {
+        'identityId': identityId,
+        'firstName': firstName,
+        'userName': userName,
+        'createdAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
   }
 }

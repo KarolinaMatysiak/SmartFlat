@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:smart_flat/core/widgets/form_input.dart';
 import 'package:smart_flat/core/widgets/form_submit_button.dart';
 import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
-import 'package:smart_flat/features/home/screens/home_screen.dart';
+import 'package:smart_flat/features/living_space/screens/living_space_onboarding_screen.dart';
 import 'package:smart_flat/features/user_profile/services/user_profile_service.dart';
 
 class UserProfileOnboardingForm extends StatefulWidget {
@@ -38,7 +38,7 @@ class _UserProfileOnboardingForm extends State<UserProfileOnboardingForm> {
 
       Navigator.of(context).push(
         MaterialPageRoute(
-          builder: (_) => const HomeScreen(),
+          builder: (_) => const LivingSpaceSetupScreen(),
         ),
       );
     } catch (e) {

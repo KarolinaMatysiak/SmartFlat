@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:smart_flat/core/widgets/form_input.dart';
-import 'package:smart_flat/features/auth/common/services/auth_service.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_form_logo.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_email_input.dart';
 import 'package:smart_flat/features/auth/common/widgets/auth_password_input.dart';
 import 'package:smart_flat/core/widgets/form_submit_button.dart';
-import 'package:smart_flat/features/auth/gate/auth_gate.dart';
+import 'package:smart_flat/features/auth/providers/auth_provider.dart';
 import 'package:smart_flat/features/auth/sign_up/screens/sign_up_screen.dart';
 import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
 
@@ -31,13 +30,9 @@ class _SignInForm extends State<SignInForm> {
     setState(() => loading = true);
 
     try {
-      await AuthService.signIn(
+      await context.read<AuthProvider>().signIn(
         email: emailController.text.trim(),
         password: passwordController.text.trim(),
-      );
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const AuthGate()),
-            (route) => false,
       );
     } catch (e) {
       if (!mounted) {

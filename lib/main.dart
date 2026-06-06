@@ -1,6 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:smart_flat/features/auth/gate/auth_gate.dart';
+import 'package:provider/provider.dart';
+import 'package:smart_flat/core/navigation/auth_router.dart';
+import 'package:smart_flat/features/auth/providers/auth_provider.dart';
+import 'package:smart_flat/features/user_profile/providers/user_profile_provider.dart';
+import 'features/living_space/providers/living_space_provider.dart';
 import 'infrastructure/firebase/firebase_options.dart';
 
 void main() async {
@@ -8,7 +12,16 @@ void main() async {
 
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(create: (_) => LivingSpaceProvider()),
+        ChangeNotifierProvider(create: (_) => UserProfileProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -69,7 +82,7 @@ class MyApp extends StatelessWidget {
           ),
         ),
       ),
-      home: AuthGate(),
+      home: AuthRouter(),
     );
   }
 }
