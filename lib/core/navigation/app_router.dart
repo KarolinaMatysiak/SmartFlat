@@ -10,6 +10,8 @@ import 'package:smart_flat/features/living_space/screens/living_space_onboarding
 import 'package:smart_flat/features/user_profile/providers/user_profile_provider.dart';
 import 'package:smart_flat/features/user_profile/screens/user_profile_onboarding_screen.dart';
 import 'package:smart_flat/core/screens/loading_screen.dart';
+import 'package:smart_flat/features/task/screens/tasks_list_screen.dart';
+import 'package:smart_flat/features/task/screens/create_task_screen.dart';
 
 class AppRouter {
   static GoRouter createRouter(BuildContext context) {
@@ -34,7 +36,7 @@ class AppRouter {
           return '/login';
         }
 
-        if (isLoggingIn || isRegistering) {
+        if (isAuthenticated && (isLoggingIn || isRegistering)) {
           return '/';
         }
 
@@ -43,16 +45,14 @@ class AppRouter {
         }
 
         if (!userProfileProvider.hasProfile) {
-          if (state.matchedLocation != '/onboarding/profile') {
+          if (state.matchedLocation != '/onboarding/profile')
             return '/onboarding/profile';
-          }
           return null;
         }
 
         if (!spaceProvider.hasSpaces) {
-          if (state.matchedLocation != '/onboarding/space') {
+          if (state.matchedLocation != '/onboarding/space')
             return '/onboarding/space';
-          }
           return null;
         }
 
@@ -92,6 +92,16 @@ class AppRouter {
         GoRoute(
           path: '/onboarding/space',
           builder: (context, state) => const LivingSpaceSetupScreen(),
+        ),
+        GoRoute(
+          path: '/tasks',
+          builder: (context, state) => const TasksListScreen(),
+          routes: [
+            GoRoute(
+              path: 'create',
+              builder: (context, state) => const CreateTaskScreen(),
+            ),
+          ],
         ),
       ],
     );

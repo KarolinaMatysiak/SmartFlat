@@ -4,7 +4,7 @@ import 'package:smart_flat/core/screens/loading_screen.dart';
 import 'package:smart_flat/core/widgets/app_background.dart';
 import 'package:smart_flat/features/auth/providers/auth_provider.dart';
 import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
-import 'package:smart_flat/features/task/widgets/task_todo_widget.dart';
+import 'package:smart_flat/features/task/widgets/tasks_overview_widget.dart';
 
 class LivingSpaceScreen extends StatelessWidget {
   const LivingSpaceScreen({super.key});
@@ -48,7 +48,7 @@ class LivingSpaceScreen extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisAlignment: MainAxisAlignment.start,
               children: const [
-                TodoListWidget(),
+                TasksOverviewWidget(),
               ],
             ),
           ),

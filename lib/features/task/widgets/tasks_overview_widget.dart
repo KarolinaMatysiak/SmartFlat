@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import 'package:smart_flat/features/task/providers/task_provider.dart';
 
-class TodoListWidget extends StatelessWidget {
-  const TodoListWidget({super.key});
+class TasksOverviewWidget extends StatelessWidget {
+  const TasksOverviewWidget({super.key});
 
   @override
   Widget build(BuildContext context) {
     final taskProvider = context.watch<TaskProvider>();
-
     final double widgetHeight = MediaQuery.of(context).size.height / 3;
 
     return SizedBox(
@@ -26,9 +26,13 @@ class TodoListWidget extends StatelessWidget {
           ),
         ),
         shadowColor: Colors.black.withOpacity(0.04),
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: _buildWidgetContent(context, taskProvider),
+        child: InkWell(
+          borderRadius: BorderRadius.circular(28),
+          onTap: () => context.push('/tasks'),
+          child: Padding(
+            padding: const EdgeInsets.all(20.0),
+            child: _buildWidgetContent(context, taskProvider),
+          ),
         ),
       ),
     );
@@ -66,10 +70,10 @@ class TodoListWidget extends StatelessWidget {
           children: [
             Row(
               children: [
-                Icon(Icons.format_list_bulleted, color: Colors.blue, size: 22),
-                SizedBox(width: 8),
-                Text(
-                  "Zadania",
+                const Icon(Icons.format_list_bulleted, color: Colors.blue, size: 22),
+                const SizedBox(width: 8),
+                const Text(
+                  "Tasks",
                   style: TextStyle(
                     fontSize: 18,
                     fontWeight: FontWeight.bold,
@@ -89,10 +93,10 @@ class TodoListWidget extends StatelessWidget {
           ],
         ),
         const SizedBox(height: 16),
-
         Expanded(
           child: ListView.separated(
             padding: EdgeInsets.zero,
+            physics: const NeverScrollableScrollPhysics(),
             itemCount: displayDocs.length,
             separatorBuilder: (_, __) => Divider(
               color: Colors.grey.withOpacity(0.15),
@@ -107,61 +111,51 @@ class TodoListWidget extends StatelessWidget {
 
               final isFirst = index == 0;
 
-              return InkWell(
-                onTap: () {
-                  print("Clicked task ID: ${doc.id}");
-                },
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 10.0),
-                  child: Row(
-                    children: [
-                      // Okrągły checkbox / gwiazdka
-                      Icon(
-                        isFirst ? Icons.star_rounded : Icons.radio_button_off_rounded,
-                        color: isFirst ? Colors.amber : Colors.grey.shade400,
-                        size: isFirst ? 26 : 22,
-                      ),
-                      const SizedBox(width: 12),
-
-                      // Tekst zadania
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
+              return Padding(
+                padding: const EdgeInsets.symmetric(vertical: 10.0),
+                child: Row(
+                  children: [
+                    Icon(
+                      isFirst ? Icons.star_rounded : Icons.radio_button_off_rounded,
+                      color: isFirst ? Colors.amber : Colors.grey.shade400,
+                      size: isFirst ? 26 : 22,
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            title,
+                            style: TextStyle(
+                              fontSize: isFirst ? 17 : 15,
+                              fontWeight: isFirst ? FontWeight.bold : FontWeight.w500,
+                              color: Colors.black87,
+                              letterSpacing: -0.2,
+                            ),
+                          ),
+                          if (description.isNotEmpty) ...[
+                            const SizedBox(height: 2),
                             Text(
-                              title,
+                              description,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
                               style: TextStyle(
-                                fontSize: isFirst ? 17 : 15,
-                                fontWeight: isFirst ? FontWeight.bold : FontWeight.w500,
-                                color: Colors.black87,
-                                letterSpacing: -0.2,
+                                fontSize: isFirst ? 14 : 12,
+                                color: Colors.grey.shade500,
                               ),
                             ),
-                            if (description.isNotEmpty) ...[
-                              const SizedBox(height: 2),
-                              Text(
-                                description,
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: isFirst ? 14 : 12,
-                                  color: Colors.grey.shade500,
-                                ),
-                              ),
-                            ],
                           ],
-                        ),
+                        ],
                       ),
-                      Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 18),
-                    ],
-                  ),
+                    ),
+                    Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 18),
+                  ],
                 ),
               );
             },
           ),
         ),
-
-        // Trzy kropki na dole
         if (totalTasksCount > 5) ...[
           Padding(
             padding: const EdgeInsets.only(top: 8.0),

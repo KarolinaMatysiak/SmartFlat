@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:smart_flat/features/task/services/task_service.dart';
 
 class TaskProvider extends ChangeNotifier {
   final TaskService _taskService = TaskService();
+  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   QuerySnapshot<Map<String, dynamic>>? _tasksSnapshot;
   StreamSubscription? _tasksSubscription;
@@ -51,15 +53,13 @@ class TaskProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> createTask({
-    required String createdBy,
-    required String livingSpaceId,
-    required String title,
-    required String description,
-  }) async {
+  Future<void> addTask(String title, String description) async {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null || _currentSpaceId == null) return;
+
     await _taskService.createTask(
-      createdBy: createdBy,
-      livingSpaceId: livingSpaceId,
+      createdBy: uid,
+      livingSpaceId: _currentSpaceId!,
       title: title,
       description: description,
     );
