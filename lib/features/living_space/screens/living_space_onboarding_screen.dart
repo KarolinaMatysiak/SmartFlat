@@ -29,7 +29,7 @@ class LivingSpaceSetupScreen extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: LivingSpaceOnboardingForm(
-                createdBy: authProvider.currentUser!.uid,
+                userId: authProvider.currentUser!.uid,
               ),
             ),
           ),

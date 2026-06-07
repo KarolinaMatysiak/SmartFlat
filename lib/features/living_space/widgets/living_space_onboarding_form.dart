@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_flat/core/widgets/form_input.dart';
 import 'package:smart_flat/core/widgets/form_submit_button.dart';
 import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
+import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
 import 'package:smart_flat/features/living_space/screens/living_space_screen.dart';
+import 'package:smart_flat/features/living_space/services/living_space_invitation_service.dart';
 import 'package:smart_flat/features/living_space/services/living_space_service.dart';
 
 enum LivingSpaceMode { create, join }
 
 class LivingSpaceOnboardingForm extends StatefulWidget {
-  final String createdBy;
+  final String userId;
 
-  const LivingSpaceOnboardingForm({super.key, required this.createdBy});
+  const LivingSpaceOnboardingForm({super.key, required this.userId});
 
   @override
   State<LivingSpaceOnboardingForm> createState() =>
@@ -28,6 +32,8 @@ class _LivingSpaceOnboardingFormState extends State<LivingSpaceOnboardingForm> {
   bool loading = false;
 
   Future<void> submit() async {
+    final livingSpaceProvider = context.read<LivingSpaceProvider>();
+
     final isValid = _formKey.currentState!.validate();
 
     if (!isValid) {
@@ -39,24 +45,14 @@ class _LivingSpaceOnboardingFormState extends State<LivingSpaceOnboardingForm> {
     try {
       if (selectedMode == LivingSpaceMode.create) {
         final name = livingSpaceName.text.trim();
-        await LivingSpaceService().createLivingSpace(
-          createdBy: widget.createdBy,
+        await livingSpaceProvider.createLivingSpace(
+          createdBy: widget.userId,
           name: name,
         );
       } else {
         final code = inviteCode.text.trim();
-
-        // TODO: Join living space
-        print('Join living space with code: $code');
+        await LivingSpaceInvitationService().joinSpaceWithCode(widget.userId, code);
       }
-
-      if (!mounted) {
-        return;
-      }
-
-      Navigator.of(context).pushReplacement(
-        MaterialPageRoute(builder: (_) => const LivingSpaceScreen()),
-      );
     } catch (e) {
       if (!mounted) {
         return;

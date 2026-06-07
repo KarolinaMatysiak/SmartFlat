@@ -59,7 +59,7 @@ class LivingSpaceProvider extends ChangeNotifier {
         );
   }
 
-  Future<void> createSpace({
+  Future<void> createLivingSpace({
     required String createdBy,
     required String name,
   }) async {

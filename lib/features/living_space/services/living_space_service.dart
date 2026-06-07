@@ -12,18 +12,18 @@ class LivingSpaceService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<QuerySnapshot<Map<String, dynamic>>> getLivingSpacesByUser(
-    String createdBy,
+    String userId,
   ) {
     return _firestore
         .collection('livingSpaces')
-        .where('createdBy', isEqualTo: createdBy)
+        .where('memberIds', arrayContains: userId)
         .get();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> watchLivingSpaces(String createdBy) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> watchLivingSpaces(String userId) {
     return _firestore
         .collection('livingSpaces')
-        .where('createdBy', isEqualTo: createdBy)
+        .where('memberIds', arrayContains: userId)
         .snapshots();
   }
 
@@ -37,6 +37,18 @@ class LivingSpaceService {
       'createdBy': createdBy,
       'name': name,
       'createdAt': FieldValue.serverTimestamp(),
+      'memberIds': [createdBy],
     });
+  }
+
+  Future<List<Map<String, dynamic>>> getMembers(List<String> memberIds) async {
+    if (memberIds.isEmpty) return [];
+
+    final usersSnapshot = await _firestore
+        .collection('userProfiles')
+        .where('createdBy', whereIn: memberIds)
+        .get();
+
+    return usersSnapshot.docs.map((doc) => doc.data()).toList();
   }
 }
