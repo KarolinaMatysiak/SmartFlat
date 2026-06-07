@@ -3,7 +3,8 @@ import 'package:smart_flat/core/widgets/app_background.dart';
 import 'package:smart_flat/features/auth/sign_up/widgets/sign_up_form.dart';
 
 class SignUpScreen extends StatelessWidget {
-  const SignUpScreen({super.key});
+  final VoidCallback onShowSignIn;
+  const SignUpScreen({super.key, required this.onShowSignIn});
 
   @override
   Widget build(BuildContext context) {
@@ -11,8 +12,8 @@ class SignUpScreen extends StatelessWidget {
       body: AppBackground(
         child: Center(
           child: ConstrainedBox(
-            constraints: BoxConstraints(maxWidth: 420),
-            child: SignUpForm(),
+            constraints: const BoxConstraints(maxWidth: 420),
+            child: SignUpForm(onShowSignIn: onShowSignIn),
           ),
         ),
       ),

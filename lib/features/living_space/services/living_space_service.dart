@@ -12,29 +12,29 @@ class LivingSpaceService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   Future<QuerySnapshot<Map<String, dynamic>>> getLivingSpacesByUser(
-    String identityId,
+    String createdBy,
   ) {
     return _firestore
         .collection('livingSpaces')
-        .where('createdBy', isEqualTo: identityId)
+        .where('createdBy', isEqualTo: createdBy)
         .get();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> watchLivingSpaces(String identityId) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> watchLivingSpaces(String createdBy) {
     return _firestore
         .collection('livingSpaces')
-        .where('createdBy', isEqualTo: identityId)
+        .where('createdBy', isEqualTo: createdBy)
         .snapshots();
   }
 
   Future<void> createLivingSpace({
-    required String identityId,
+    required String createdBy,
     required String name,
   }) async {
     final docRef = _firestore.collection('livingSpaces').doc();
     await docRef.set({
       'id': docRef.id,
-      'createdBy': identityId,
+      'createdBy': createdBy,
       'name': name,
       'createdAt': FieldValue.serverTimestamp(),
     });

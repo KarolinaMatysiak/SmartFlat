@@ -8,9 +8,9 @@ import 'package:smart_flat/features/living_space/services/living_space_service.d
 enum LivingSpaceMode { create, join }
 
 class LivingSpaceOnboardingForm extends StatefulWidget {
-  final String identityId;
+  final String createdBy;
 
-  const LivingSpaceOnboardingForm({super.key, required this.identityId});
+  const LivingSpaceOnboardingForm({super.key, required this.createdBy});
 
   @override
   State<LivingSpaceOnboardingForm> createState() =>
@@ -40,7 +40,7 @@ class _LivingSpaceOnboardingFormState extends State<LivingSpaceOnboardingForm> {
       if (selectedMode == LivingSpaceMode.create) {
         final name = livingSpaceName.text.trim();
         await LivingSpaceService().createLivingSpace(
-          identityId: widget.identityId,
+          createdBy: widget.createdBy,
           name: name,
         );
       } else {

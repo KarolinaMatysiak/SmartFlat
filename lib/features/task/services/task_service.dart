@@ -19,13 +19,13 @@ class TaskService {
   }
 
   Future<void> createTask({
-    required String identityId,
+    required String createdBy,
     required String livingSpaceId,
     required String title,
     required String description,
   }) async {
     await _firestore.collection('tasks').add({
-      'createdBy': identityId,
+      'createdBy': createdBy,
       'livingSpaceId': livingSpaceId,
       'title': title,
       'description': description,

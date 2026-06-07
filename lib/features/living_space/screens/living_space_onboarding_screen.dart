@@ -18,6 +18,10 @@ class LivingSpaceSetupScreen extends StatelessWidget {
       return const LoadingScreen();
     }
 
+    if (!authProvider.isAuthenticated) {
+      return const LoadingScreen();
+    }
+
     if (!spaceProvider.hasSpaces) {
       return Scaffold(
         body: AppBackground(
@@ -25,7 +29,7 @@ class LivingSpaceSetupScreen extends StatelessWidget {
             child: ConstrainedBox(
               constraints: const BoxConstraints(maxWidth: 420),
               child: LivingSpaceOnboardingForm(
-                identityId: authProvider.currentUser!.uid,
+                createdBy: authProvider.currentUser!.uid,
               ),
             ),
           ),

@@ -21,7 +21,7 @@ class UserProfileOnboardingScreen extends StatelessWidget {
         child: Center(
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 420),
-            child: UserProfileOnboardingForm(identityId: userId),
+            child: UserProfileOnboardingForm(createdBy: userId),
           ),
         ),
       ),

@@ -10,7 +10,8 @@ import 'package:smart_flat/features/auth/sign_up/widgets/auth_password_confirm_i
 import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
 
 class SignUpForm extends StatefulWidget {
-  const SignUpForm({super.key});
+  final VoidCallback onShowSignIn;
+  const SignUpForm({super.key, required this.onShowSignIn});
 
   @override
   State<SignUpForm> createState() => _SignUpForm();
@@ -106,15 +107,10 @@ class _SignUpForm extends State<SignUpForm> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Already have an account?"),
+                  const Text("Already have an account?"),
                   TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SignInScreen()),
-                      );
-                    },
-                    child: Text("Sign In"),
+                    onPressed: widget.onShowSignIn,
+                    child: const Text("Sign In"),
                   ),
                 ],
               ),

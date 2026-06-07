@@ -8,33 +8,65 @@ class LivingSpaceProvider extends ChangeNotifier {
 
   QuerySnapshot<Map<String, dynamic>>? _spacesSnapshot;
   StreamSubscription? _spacesSubscription;
-  bool _isLoading = true;
+  bool _isLoading = false;
+  String? _currentUserId;
 
   QuerySnapshot<Map<String, dynamic>>? get spacesSnapshot => _spacesSnapshot;
+
   bool get isLoading => _isLoading;
-  bool get hasSpaces => _spacesSnapshot != null && _spacesSnapshot!.docs.isNotEmpty;
+
+  bool get hasSpaces =>
+      _spacesSnapshot != null && _spacesSnapshot!.docs.isNotEmpty;
+
+  String? get activeSpaceId =>
+      hasSpaces ? _spacesSnapshot!.docs.first.id : null;
+
+  void update(String? uid) {
+    if (uid == null) {
+      clear();
+    } else if (_currentUserId != uid) {
+      init(uid);
+    }
+  }
+
+  void clear() {
+    if (_currentUserId == null && _spacesSnapshot == null) return;
+    _currentUserId = null;
+    _spacesSubscription?.cancel();
+    _spacesSnapshot = null;
+    _isLoading = false;
+    notifyListeners();
+  }
 
   void init(String identityId) {
+    _currentUserId = identityId;
     _spacesSubscription?.cancel();
     _isLoading = true;
     notifyListeners();
 
-    _spacesSubscription = _livingSpaceService.watchLivingSpaces(identityId).listen(
+    _spacesSubscription = _livingSpaceService
+        .watchLivingSpaces(identityId)
+        .listen(
           (snapshot) {
-        _spacesSnapshot = snapshot;
-        _isLoading = false;
-        notifyListeners();
-      },
-      onError: (error) {
-        print("Subscription error livingSpaces: $error");
-        _isLoading = false;
-        notifyListeners();
-      },
-    );
+            _spacesSnapshot = snapshot;
+            _isLoading = false;
+            notifyListeners();
+          },
+          onError: (error) {
+            _isLoading = false;
+            notifyListeners();
+          },
+        );
   }
 
-  Future<void> createSpace({required String identityId, required String name}) async {
-    await _livingSpaceService.createLivingSpace(identityId: identityId, name: name);
+  Future<void> createSpace({
+    required String createdBy,
+    required String name,
+  }) async {
+    await _livingSpaceService.createLivingSpace(
+      createdBy: createdBy,
+      name: name,
+    );
   }
 
   @override

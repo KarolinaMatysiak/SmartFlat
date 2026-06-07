@@ -6,9 +6,9 @@ import 'package:smart_flat/features/living_space/screens/living_space_onboarding
 import 'package:smart_flat/features/user_profile/services/user_profile_service.dart';
 
 class UserProfileOnboardingForm extends StatefulWidget {
-  final String identityId;
+  final String createdBy;
 
-  const UserProfileOnboardingForm({super.key, required this.identityId});
+  const UserProfileOnboardingForm({super.key, required this.createdBy});
 
   @override
   State<UserProfileOnboardingForm> createState() =>
@@ -31,7 +31,7 @@ class _UserProfileOnboardingForm extends State<UserProfileOnboardingForm> {
 
     try {
       await UserProfileService().createUserProfile(
-        identityId: widget.identityId,
+        createdBy: widget.createdBy,
         firstName: firstName.text.trim(),
         userName: userName.text.trim(),
       );

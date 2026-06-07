@@ -9,7 +9,8 @@ import 'package:smart_flat/features/auth/sign_up/screens/sign_up_screen.dart';
 import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
 
 class SignInForm extends StatefulWidget {
-  const SignInForm({super.key});
+  final VoidCallback onShowSignUp;
+  const SignInForm({super.key, required this.onShowSignUp});
 
   @override
   State<SignInForm> createState() => _SignInForm();
@@ -99,12 +100,7 @@ class _SignInForm extends State<SignInForm> {
                 children: [
                   const Text("Don't have an account?"),
                   TextButton(
-                    onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (_) => const SignUpScreen()),
-                      );
-                    },
+                    onPressed: widget.onShowSignUp,
                     child: const Text("Sign Up"),
                   ),
                 ],

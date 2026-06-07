@@ -11,18 +11,18 @@ class UserProfileService {
 
   final FirebaseFirestore firestore = FirebaseFirestore.instance;
 
-  Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile(String identityId) {
-    return firestore.collection('userProfiles').doc(identityId).get();
+  Future<DocumentSnapshot<Map<String, dynamic>>> getUserProfile(String createdBy) {
+    return firestore.collection('userProfiles').doc(createdBy).get();
   }
 
   Future<void> createUserProfile({
-    required String identityId,
+    required String createdBy,
     required String firstName,
     required String userName,
   }) async {
-    await firestore.collection('userProfiles').doc(identityId).set(
+    await firestore.collection('userProfiles').doc(createdBy).set(
       {
-        'identityId': identityId,
+        'createdBy': createdBy,
         'firstName': firstName,
         'userName': userName,
         'createdAt': FieldValue.serverTimestamp(),

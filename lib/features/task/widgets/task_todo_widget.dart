@@ -9,11 +9,10 @@ class TodoListWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final taskProvider = context.watch<TaskProvider>();
 
-    // Obliczamy wysokość połowy ekranu (uwzględniając ewentualny pasek stanu/notcha)
-    final double halfScreenHeight = MediaQuery.of(context).size.height / 2;
+    final double widgetHeight = MediaQuery.of(context).size.height / 3;
 
     return SizedBox(
-      height: halfScreenHeight,
+      height: widgetHeight,
       width: double.infinity,
       child: Card(
         margin: EdgeInsets.zero,
