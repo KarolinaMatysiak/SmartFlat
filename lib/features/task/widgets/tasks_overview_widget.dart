@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:smart_flat/core/widgets/loading_widget.dart';
 import 'package:smart_flat/features/task/providers/task_provider.dart';
 
 class TasksOverviewWidget extends StatelessWidget {
   const TasksOverviewWidget({super.key});
+
+  final displayedTasksLimit = 4;
 
   @override
   Widget build(BuildContext context) {
@@ -31,144 +34,175 @@ class TasksOverviewWidget extends StatelessWidget {
           onTap: () => context.push('/tasks'),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: _buildWidgetContent(context, taskProvider),
+            child: _buildContent(taskProvider),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildWidgetContent(BuildContext context, TaskProvider taskProvider) {
+  Widget _buildContent(TaskProvider taskProvider) {
     if (taskProvider.isLoading) {
-      return const Center(child: CircularProgressIndicator.adaptive());
+      return const LoadingWidget();
     }
 
-    if (!taskProvider.hasTasks) {
-      return Center(
-        child: Text(
-          "No tasks for today!\nEnjoy your free time.",
-          textAlign: TextAlign.center,
-          style: TextStyle(
-            color: Colors.grey.shade500,
-            fontSize: 15,
-            fontWeight: FontWeight.w500,
-            letterSpacing: -0.2,
-          ),
-        ),
-      );
-    }
-
-    final allDocs = taskProvider.tasksSnapshot!.docs;
+    final allDocs = taskProvider.tasksSnapshot?.docs ?? [];
     final totalTasksCount = allDocs.length;
-    final displayDocs = allDocs.take(5).toList();
+    final displayDocs = allDocs.take(displayedTasksLimit).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Row(
-              children: [
-                const Icon(Icons.format_list_bulleted, color: Colors.blue, size: 22),
-                const SizedBox(width: 8),
-                const Text(
-                  "Tasks",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.4,
-                  ),
-                ),
-              ],
-            ),
-            if (totalTasksCount > 0)
-              Text(
-                "$totalTasksCount",
-                style: TextStyle(
-                  color: Colors.grey.shade400,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-          ],
-        ),
+        _buildHeader(totalTasksCount),
+
         const SizedBox(height: 16),
-        Expanded(
-          child: ListView.separated(
-            padding: EdgeInsets.zero,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: displayDocs.length,
-            separatorBuilder: (_, __) => Divider(
-              color: Colors.grey.withOpacity(0.15),
-              height: 1,
-              indent: 44,
-            ),
-            itemBuilder: (context, index) {
-              final doc = displayDocs[index];
-              final data = doc.data();
-              final title = data['title'] ?? 'No title';
-              final description = data['description'] ?? '';
 
-              final isFirst = index == 0;
-
-              return Padding(
-                padding: const EdgeInsets.symmetric(vertical: 10.0),
-                child: Row(
-                  children: [
-                    Icon(
-                      isFirst ? Icons.star_rounded : Icons.radio_button_off_rounded,
-                      color: isFirst ? Colors.amber : Colors.grey.shade400,
-                      size: isFirst ? 26 : 22,
-                    ),
-                    const SizedBox(width: 12),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            title,
-                            style: TextStyle(
-                              fontSize: isFirst ? 17 : 15,
-                              fontWeight: isFirst ? FontWeight.bold : FontWeight.w500,
-                              color: Colors.black87,
-                              letterSpacing: -0.2,
-                            ),
-                          ),
-                          if (description.isNotEmpty) ...[
-                            const SizedBox(height: 2),
-                            Text(
-                              description,
-                              maxLines: 1,
-                              overflow: TextOverflow.ellipsis,
-                              style: TextStyle(
-                                fontSize: isFirst ? 14 : 12,
-                                color: Colors.grey.shade500,
-                              ),
-                            ),
-                          ],
-                        ],
-                      ),
-                    ),
-                    Icon(Icons.chevron_right_rounded, color: Colors.grey.shade400, size: 18),
-                  ],
-                ),
-              );
-            },
+        if (!taskProvider.hasTasks)
+          Expanded(
+            child: _buildEmptyState(),
+          )
+        else
+          Expanded(
+            child: _buildTasksList(displayDocs),
           ),
-        ),
-        if (totalTasksCount > 5) ...[
+
+        if (taskProvider.hasTasks && totalTasksCount > displayedTasksLimit)
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Center(
-              child: Icon(
-                Icons.more_horiz_rounded,
-                color: Colors.grey.shade400,
-                size: 24,
+              child: Text(
+                '+${totalTasksCount - displayedTasksLimit} more',
+                style: TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.bold,
+                  letterSpacing: -0.4,
+                ),
               ),
             ),
           ),
-        ],
       ],
+    );
+  }
+
+  Widget _buildHeader(int totalTasksCount) {
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        const Row(
+          children: [
+            Icon(
+              Icons.format_list_bulleted,
+              color: Colors.blue,
+              size: 22,
+            ),
+            SizedBox(width: 8),
+            Text(
+              'Tasks',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.4,
+              ),
+            ),
+          ],
+        ),
+        if (totalTasksCount > 0)
+          Text(
+            '$totalTasksCount',
+            style: TextStyle(
+              color: Colors.grey,
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Text(
+        'No tasks for today!\nEnjoy your free time.',
+        textAlign: TextAlign.center,
+        style: TextStyle(
+          color: Colors.grey.shade500,
+          fontSize: 15,
+          fontWeight: FontWeight.w500,
+          letterSpacing: -0.2,
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTasksList(List displayDocs) {
+    return ListView.separated(
+      padding: EdgeInsets.zero,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: displayDocs.length,
+      separatorBuilder: (_, __) => Divider(
+        color: Colors.grey.withOpacity(0.15),
+        height: 1,
+        indent: 44,
+      ),
+      itemBuilder: (context, index) {
+        return _buildTaskItem(displayDocs[index], index);
+      },
+    );
+  }
+
+  Widget _buildTaskItem(dynamic doc, int index) {
+    final data = doc.data();
+
+    final title = data['title'] ?? 'No title';
+    final description = data['description'] ?? '';
+
+    final isFirst = index == 0;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 10),
+      child: Row(
+        children: [
+          Icon(
+            Icons.radio_button_off_rounded,
+            color: Colors.grey.shade400,
+            size: 22,
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  title,
+                  style: TextStyle(
+                    fontSize: 15,
+                    fontWeight:
+                    FontWeight.w500,
+                    color: Colors.black87,
+                    letterSpacing: -0.2,
+                  ),
+                ),
+                if (description.isNotEmpty) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    description,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: TextStyle(
+                      fontSize: isFirst ? 14 : 12,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                ],
+              ],
+            ),
+          ),
+          Icon(
+            Icons.chevron_right_rounded,
+            color: Colors.grey.shade400,
+            size: 18,
+          ),
+        ],
+      ),
     );
   }
 }
