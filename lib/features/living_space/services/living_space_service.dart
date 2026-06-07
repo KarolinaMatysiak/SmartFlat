@@ -16,14 +16,14 @@ class LivingSpaceService {
   ) {
     return _firestore
         .collection('livingSpaces')
-        .where('ownerId', isEqualTo: identityId)
+        .where('createdBy', isEqualTo: identityId)
         .get();
   }
 
-  Stream<QuerySnapshot<Map<String, dynamic>>> listenToLivingSpaces(String identityId) {
+  Stream<QuerySnapshot<Map<String, dynamic>>> watchLivingSpaces(String identityId) {
     return _firestore
         .collection('livingSpaces')
-        .where('ownerId', isEqualTo: identityId)
+        .where('createdBy', isEqualTo: identityId)
         .snapshots();
   }
 
@@ -31,8 +31,10 @@ class LivingSpaceService {
     required String identityId,
     required String name,
   }) async {
-    await _firestore.collection('livingSpaces').add({
-      'ownerId': identityId,
+    final docRef = _firestore.collection('livingSpaces').doc();
+    await docRef.set({
+      'id': docRef.id,
+      'createdBy': identityId,
       'name': name,
       'createdAt': FieldValue.serverTimestamp(),
     });

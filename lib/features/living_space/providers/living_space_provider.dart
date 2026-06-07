@@ -14,12 +14,12 @@ class LivingSpaceProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get hasSpaces => _spacesSnapshot != null && _spacesSnapshot!.docs.isNotEmpty;
 
-  void init(String userId) {
+  void init(String identityId) {
     _spacesSubscription?.cancel();
     _isLoading = true;
     notifyListeners();
 
-    _spacesSubscription = _livingSpaceService.listenToLivingSpaces(userId).listen(
+    _spacesSubscription = _livingSpaceService.watchLivingSpaces(identityId).listen(
           (snapshot) {
         _spacesSnapshot = snapshot;
         _isLoading = false;

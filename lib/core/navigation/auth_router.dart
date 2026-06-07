@@ -5,6 +5,7 @@ import 'package:smart_flat/core/navigation/initial_flow_router.dart';
 import 'package:smart_flat/features/auth/providers/auth_provider.dart';
 import 'package:smart_flat/features/auth/sign_in/screens/sign_in_screen.dart';
 import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
+import 'package:smart_flat/features/task/providers/task_provider.dart';
 import 'package:smart_flat/features/user_profile/providers/user_profile_provider.dart';
 
 class AuthRouter extends StatelessWidget {
