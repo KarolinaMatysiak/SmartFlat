@@ -142,6 +142,11 @@ class _LivingSpaceOnboardingFormState extends State<LivingSpaceOnboardingForm> {
                         controller: livingSpaceName,
                         icon: Icons.home_outlined,
                         label: "Name",
+                        onTap: () {
+                          setState(() {
+                            selectedMode = LivingSpaceMode.create;
+                          });
+                        },
                         validator: (value) {
                           if (selectedMode != LivingSpaceMode.create) {
                             return null;
@@ -210,6 +215,11 @@ class _LivingSpaceOnboardingFormState extends State<LivingSpaceOnboardingForm> {
                         controller: inviteCode,
                         icon: Icons.key,
                         label: "Code",
+                        onTap: () {
+                          setState(() {
+                            selectedMode = LivingSpaceMode.join;
+                          });
+                        },
                         validator: (value) {
                           if (selectedMode != LivingSpaceMode.join) {
                             return null;

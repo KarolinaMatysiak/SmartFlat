@@ -6,6 +6,7 @@ class FormInput extends StatelessWidget {
   final String label;
   final bool? obscure;
   final String? Function(String?)? validator;
+  final VoidCallback? onTap;
 
   const FormInput({
     super.key,
@@ -14,6 +15,7 @@ class FormInput extends StatelessWidget {
     required this.label,
     this.obscure,
     this.validator,
+    this.onTap,
   });
 
   @override
@@ -24,6 +26,7 @@ class FormInput extends StatelessWidget {
       controller: controller,
       obscureText: obscure ?? false,
       validator: validator,
+      onTap: onTap,
       decoration: InputDecoration(
         labelText: label,
         prefixIcon: Icon(icon, color: cs.primary),
