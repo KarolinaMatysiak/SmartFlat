@@ -23,13 +23,16 @@ class TaskService {
     required String livingSpaceId,
     required String title,
     required String description,
+    String? assignedTo,
   }) async {
     await _firestore.collection('tasks').add({
       'createdBy': createdBy,
       'livingSpaceId': livingSpaceId,
       'title': title,
       'description': description,
+      'assignedTo': assignedTo,
       'createdAt': FieldValue.serverTimestamp(),
+      'status': 'todo',
     });
   }
 }

@@ -56,16 +56,32 @@ class TasksListScreen extends StatelessWidget {
         final data = docs[index].data();
         final title = data['title'] ?? 'Bez tytułu';
         final description = data['description'] ?? '';
+        final assignedTo = data['assignedTo'];
 
         return Card(
           child: ListTile(
             leading: CircleAvatar(
               backgroundColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              child: Text("${index + 1}", 
-                style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
+              child: assignedTo != null 
+                ? const Icon(Icons.person, size: 20) 
+                : Text("${index + 1}", 
+                    style: TextStyle(color: Theme.of(context).colorScheme.primary, fontWeight: FontWeight.bold)),
             ),
             title: Text(title, style: const TextStyle(fontWeight: FontWeight.bold)),
-            subtitle: description.isNotEmpty ? Text(description) : null,
+            subtitle: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (description.isNotEmpty) Text(description),
+                if (assignedTo != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 4.0),
+                    child: Text(
+                      "Przypisano do: ${assignedTo.toString().substring(0, 5)}...", // Skrócony ID dla teraz
+                      style: TextStyle(fontSize: 12, color: Colors.grey[600], fontStyle: FontStyle.italic),
+                    ),
+                  ),
+              ],
+            ),
             trailing: Checkbox(
               value: false,
               onChanged: (val) {

@@ -53,7 +53,7 @@ class TaskProvider extends ChangeNotifier {
     );
   }
 
-  Future<void> addTask(String title, String description) async {
+  Future<void> addTask(String title, String description, {String? assignedTo}) async {
     final uid = _auth.currentUser?.uid;
     if (uid == null || _currentSpaceId == null) return;
 
@@ -62,6 +62,7 @@ class TaskProvider extends ChangeNotifier {
       livingSpaceId: _currentSpaceId!,
       title: title,
       description: description,
+      assignedTo: assignedTo,
     );
   }
 
