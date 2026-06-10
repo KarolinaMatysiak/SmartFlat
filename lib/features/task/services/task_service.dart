@@ -32,7 +32,21 @@ class TaskService {
       'description': description,
       'assignedTo': assignedTo,
       'createdAt': FieldValue.serverTimestamp(),
-      'status': 'todo',
+      'status': 'pending',
     });
+  }
+
+  Future<void> updateTaskStatus(String taskId, String status) async {
+    await _firestore.collection('tasks').doc(taskId).update({
+      'status': status,
+    });
+  }
+
+  Future<void> updateTask(String taskId, Map<String, dynamic> data) async {
+    await _firestore.collection('tasks').doc(taskId).update(data);
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    await _firestore.collection('tasks').doc(taskId).delete();
   }
 }

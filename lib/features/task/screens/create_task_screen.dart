@@ -1,3 +1,4 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -6,15 +7,17 @@ import 'package:smart_flat/features/living_space/providers/living_space_provider
 import 'package:smart_flat/features/living_space/services/living_space_service.dart';
 
 class CreateTaskScreen extends StatefulWidget {
-  const CreateTaskScreen({super.key});
+  final QueryDocumentSnapshot<Map<String, dynamic>>? taskToEdit;
+
+  const CreateTaskScreen({super.key, this.taskToEdit});
 
   @override
   State<CreateTaskScreen> createState() => _CreateTaskScreenState();
 }
 
 class _CreateTaskScreenState extends State<CreateTaskScreen> {
-  final _titleController = TextEditingController();
-  final _descController = TextEditingController();
+  late TextEditingController _titleController;
+  late TextEditingController _descController;
   final _livingSpaceService = LivingSpaceService();
   
   List<Map<String, dynamic>> _members = [];
@@ -25,6 +28,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   @override
   void initState() {
     super.initState();
+    _titleController = TextEditingController(text: widget.taskToEdit?.data()['title']);
+    _descController = TextEditingController(text: widget.taskToEdit?.data()['description']);
+    _selectedMemberId = widget.taskToEdit?.data()['assignedTo'];
     _fetchMembers();
   }
 
@@ -75,11 +81,20 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
     setState(() => _isSaving = true);
     
     try {
-      await context.read<TaskProvider>().addTask(
-        title, 
-        desc, 
-        assignedTo: _selectedMemberId,
-      );
+      if (widget.taskToEdit != null) {
+        await context.read<TaskProvider>().updateTask(
+          widget.taskToEdit!.id,
+          title: title,
+          description: desc,
+          assignedTo: _selectedMemberId,
+        );
+      } else {
+        await context.read<TaskProvider>().addTask(
+          title, 
+          desc, 
+          assignedTo: _selectedMemberId,
+        );
+      }
       if (mounted) context.pop();
     } catch (e) {
       if (mounted) {

@@ -17,6 +17,16 @@ class TaskProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   bool get hasTasks => _tasksSnapshot != null && _tasksSnapshot!.docs.isNotEmpty;
 
+  List<QueryDocumentSnapshot<Map<String, dynamic>>> get userTasks {
+    final uid = _auth.currentUser?.uid;
+    if (uid == null || _tasksSnapshot == null) return [];
+    return _tasksSnapshot!.docs
+        .where((doc) => doc.data()['assignedTo'] == uid)
+        .toList();
+  }
+
+  bool get hasUserTasks => userTasks.isNotEmpty;
+
   void update(String? spaceId) {
     if (spaceId == null) {
       clear();
@@ -64,6 +74,24 @@ class TaskProvider extends ChangeNotifier {
       description: description,
       assignedTo: assignedTo,
     );
+  }
+
+  Future<void> toggleTaskStatus(String taskId, String currentStatus) async {
+    final newStatus = currentStatus == 'completed' ? 'pending' : 'completed';
+    await _taskService.updateTaskStatus(taskId, newStatus);
+  }
+
+  Future<void> updateTask(String taskId, {String? title, String? description, String? assignedTo}) async {
+    final Map<String, dynamic> data = {};
+    if (title != null) data['title'] = title;
+    if (description != null) data['description'] = description;
+    data['assignedTo'] = assignedTo;
+
+    await _taskService.updateTask(taskId, data);
+  }
+
+  Future<void> deleteTask(String taskId) async {
+    await _taskService.deleteTask(taskId);
   }
 
   @override

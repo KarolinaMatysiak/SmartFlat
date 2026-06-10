@@ -34,21 +34,21 @@ class TasksOverviewWidget extends StatelessWidget {
           onTap: () => context.push('/tasks'),
           child: Padding(
             padding: const EdgeInsets.all(20.0),
-            child: _buildContent(taskProvider),
+            child: _buildContent(context, taskProvider),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildContent(TaskProvider taskProvider) {
+  Widget _buildContent(BuildContext context, TaskProvider taskProvider) {
     if (taskProvider.isLoading) {
       return const LoadingWidget();
     }
 
-    final allDocs = taskProvider.tasksSnapshot?.docs ?? [];
-    final totalTasksCount = allDocs.length;
-    final displayDocs = allDocs.take(displayedTasksLimit).toList();
+    final userDocs = taskProvider.userTasks;
+    final totalTasksCount = userDocs.length;
+    final displayDocs = userDocs.take(displayedTasksLimit).toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -57,22 +57,22 @@ class TasksOverviewWidget extends StatelessWidget {
 
         const SizedBox(height: 16),
 
-        if (!taskProvider.hasTasks)
+        if (!taskProvider.hasUserTasks)
           Expanded(
             child: _buildEmptyState(),
           )
         else
           Expanded(
-            child: _buildTasksList(displayDocs),
+            child: _buildTasksList(context, displayDocs),
           ),
 
-        if (taskProvider.hasTasks && totalTasksCount > displayedTasksLimit)
+        if (taskProvider.hasUserTasks && totalTasksCount > displayedTasksLimit)
           Padding(
             padding: const EdgeInsets.only(top: 8.0),
             child: Center(
               child: Text(
                 '+${totalTasksCount - displayedTasksLimit} more',
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
                   letterSpacing: -0.4,
@@ -133,7 +133,7 @@ class TasksOverviewWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildTasksList(List displayDocs) {
+  Widget _buildTasksList(BuildContext context, List displayDocs) {
     return ListView.separated(
       padding: EdgeInsets.zero,
       physics: const NeverScrollableScrollPhysics(),
@@ -144,27 +144,33 @@ class TasksOverviewWidget extends StatelessWidget {
         indent: 44,
       ),
       itemBuilder: (context, index) {
-        return _buildTaskItem(displayDocs[index], index);
+        return _buildTaskItem(context, displayDocs[index], index);
       },
     );
   }
 
-  Widget _buildTaskItem(dynamic doc, int index) {
+  Widget _buildTaskItem(BuildContext context, dynamic doc, int index) {
     final data = doc.data();
+    final taskId = doc.id;
 
     final title = data['title'] ?? 'No title';
     final description = data['description'] ?? '';
-
-    final isFirst = index == 0;
+    final status = data['status'] ?? 'pending';
+    final isCompleted = status == 'completed';
 
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10),
       child: Row(
         children: [
-          Icon(
-            Icons.radio_button_off_rounded,
-            color: Colors.grey.shade400,
-            size: 22,
+          GestureDetector(
+            onTap: () {
+              context.read<TaskProvider>().toggleTaskStatus(taskId, status);
+            },
+            child: Icon(
+              isCompleted ? Icons.check_circle_rounded : Icons.pending_rounded,
+              color: isCompleted ? Colors.green.shade500 : Colors.amber.shade600,
+              size: 24,
+            ),
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -175,20 +181,19 @@ class TasksOverviewWidget extends StatelessWidget {
                   title,
                   style: TextStyle(
                     fontSize: 15,
-                    fontWeight:
-                    FontWeight.w500,
-                    color: Colors.black87,
+                    fontWeight: FontWeight.w500,
+                    color: isCompleted ? Colors.grey : Colors.black87,
                     letterSpacing: -0.2,
                   ),
                 ),
                 if (description.isNotEmpty) ...[
-                  const SizedBox(height: 2),
+                  const SizedBox(height: 1),
                   Text(
                     description,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: isFirst ? 14 : 12,
+                      fontSize: 11,
                       color: Colors.grey.shade500,
                     ),
                   ),
@@ -198,7 +203,7 @@ class TasksOverviewWidget extends StatelessWidget {
           ),
           Icon(
             Icons.chevron_right_rounded,
-            color: Colors.grey.shade400,
+            color: Colors.grey.shade300,
             size: 18,
           ),
         ],
