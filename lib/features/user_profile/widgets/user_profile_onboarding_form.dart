@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:smart_flat/core/widgets/form_input.dart';
 import 'package:smart_flat/core/widgets/form_submit_button.dart';
 import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
 import 'package:smart_flat/features/living_space/screens/living_space_onboarding_screen.dart';
+import 'package:smart_flat/features/user_profile/providers/user_profile_provider.dart';
 import 'package:smart_flat/features/user_profile/services/user_profile_service.dart';
 
 class UserProfileOnboardingForm extends StatefulWidget {
@@ -30,17 +32,11 @@ class _UserProfileOnboardingForm extends State<UserProfileOnboardingForm> {
     setState(() => loading = true);
 
     try {
-      await UserProfileService().createUserProfile(
-        createdBy: widget.createdBy,
-        firstName: firstName.text.trim(),
-        userName: userName.text.trim(),
-      );
-
-      Navigator.of(context).push(
-        MaterialPageRoute(
-          builder: (_) => const LivingSpaceSetupScreen(),
-        ),
-      );
+      await context.read<UserProfileProvider>().createUserProfile(
+            createdBy: widget.createdBy,
+            firstName: firstName.text.trim(),
+            userName: userName.text.trim(),
+          );
     } catch (e) {
       if (!mounted) {
         return;
