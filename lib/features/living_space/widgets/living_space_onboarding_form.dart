@@ -3,7 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_flat/core/widgets/form_input.dart';
 import 'package:smart_flat/core/widgets/form_submit_button.dart';
-import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
+import 'package:smart_flat/core/actions/show_error_snack_bar.dart';
 import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
 import 'package:smart_flat/features/living_space/screens/living_space_screen.dart';
 import 'package:smart_flat/features/living_space/services/living_space_invitation_service.dart';

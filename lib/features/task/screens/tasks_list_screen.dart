@@ -21,7 +21,7 @@ class _TasksListScreenState extends State<TasksListScreen> {
   bool _isLoadingMembers = true;
 
   // Filtry
-  String _statusFilter = 'all'; // 'all', 'pending', 'completed'
+  String _statusFilter = 'all';
   String? _memberFilter; // null (wszyscy) lub ID użytkownika
 
   @override
@@ -112,7 +112,7 @@ class _TasksListScreenState extends State<TasksListScreen> {
         onPressed: () => context.push('/tasks/create'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text("Nowe zadanie", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: const Text("New task", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -123,34 +123,33 @@ class _TasksListScreenState extends State<TasksListScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          // Filtr Statusu
           _FilterChip(
-            label: "Wszystkie",
+            label: "All",
             isSelected: _statusFilter == 'all',
             onSelected: (_) => setState(() => _statusFilter = 'all'),
           ),
           const SizedBox(width: 8),
           _FilterChip(
-            label: "Oczekujące",
+            label: "Pending",
             isSelected: _statusFilter == 'pending',
             onSelected: (_) => setState(() => _statusFilter = 'pending'),
           ),
           const SizedBox(width: 8),
           _FilterChip(
-            label: "Wykonane",
+            label: "Completed",
             isSelected: _statusFilter == 'completed',
             onSelected: (_) => setState(() => _statusFilter = 'completed'),
           ),
           const SizedBox(width: 16),
           Container(width: 1, height: 24, color: Colors.grey[300]),
           const SizedBox(width: 16),
-          // Filtr Autora
+
           DropdownButton<String?>(
             value: _memberFilter,
-            hint: const Text("Filtruj osobę", style: TextStyle(fontSize: 14)),
+            hint: const Text("Filter members", style: TextStyle(fontSize: 14)),
             underline: const SizedBox(),
             items: [
-              const DropdownMenuItem(value: null, child: Text("Wszyscy")),
+              const DropdownMenuItem(value: null, child: Text("Everyone")),
               ..._memberNames.entries.map((e) => DropdownMenuItem(
                     value: e.key,
                     child: Text(e.value),
@@ -165,10 +164,9 @@ class _TasksListScreenState extends State<TasksListScreen> {
 
   Widget _buildTasksList(BuildContext context, TaskProvider taskProvider) {
     if (!taskProvider.hasTasks) {
-      return _buildEmptyState("Brak zadań");
+      return _buildEmptyState("This space has no tasks yet");
     }
 
-    // Aplikowanie filtrów
     final filteredDocs = taskProvider.tasksSnapshot!.docs.where((doc) {
       final data = doc.data();
       final status = data['status'] ?? 'pending';
@@ -181,7 +179,7 @@ class _TasksListScreenState extends State<TasksListScreen> {
     }).toList();
 
     if (filteredDocs.isEmpty) {
-      return _buildEmptyState("Brak zadań spełniających kryteria");
+      return _buildEmptyState("There are no results for current filter");
     }
 
     return ListView.separated(

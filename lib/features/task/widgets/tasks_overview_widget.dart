@@ -121,7 +121,7 @@ class TasksOverviewWidget extends StatelessWidget {
   Widget _buildEmptyState() {
     return Center(
       child: Text(
-        'No tasks for today!\nEnjoy your free time.',
+        'There are no tasks for you for today!\nEnjoy your free time.',
         textAlign: TextAlign.center,
         style: TextStyle(
           color: Colors.grey.shade500,

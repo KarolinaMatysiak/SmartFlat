@@ -111,7 +111,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Nowe Zadanie"),
+        title: const Text("New Task"),
       ),
       body: Padding(
         padding: const EdgeInsets.all(20.0),
@@ -121,7 +121,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             TextField(
               controller: _titleController,
               decoration: const InputDecoration(
-                labelText: "Tytuł zadania",
+                labelText: "Title",
                 border: OutlineInputBorder(),
               ),
             ),
@@ -130,7 +130,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               controller: _descController,
               maxLines: 3,
               decoration: const InputDecoration(
-                labelText: "Opis (opcjonalnie)",
+                labelText: "Description",
                 border: OutlineInputBorder(),
               ),
             ),
@@ -141,14 +141,14 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               DropdownButtonFormField<String>(
                 value: _selectedMemberId,
                 decoration: const InputDecoration(
-                  labelText: "Przypisz do",
+                  labelText: "Assign to",
                   border: OutlineInputBorder(),
                 ),
                 items: [
-                  const DropdownMenuItem(value: null, child: Text("Nieprzypisane")),
+                  const DropdownMenuItem(value: null, child: Text("Unassigned")),
                   ..._members.map((m) => DropdownMenuItem(
                     value: m['createdBy'],
-                    child: Text(m['firstName'] ?? m['userName'] ?? 'Użytkownik'),
+                    child: Text(m['firstName'] ?? m['userName'] ?? 'User'),
                   )),
                 ],
                 onChanged: (val) => setState(() => _selectedMemberId = val),
@@ -163,7 +163,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               ),
               child: _isSaving 
                 ? const CircularProgressIndicator(color: Colors.white)
-                : const Text("Zapisz Zadanie", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                : const Text("Create", style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             ),
           ],
         ),

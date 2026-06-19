@@ -7,7 +7,7 @@ import 'package:smart_flat/features/auth/providers/auth_provider.dart';
 import 'package:smart_flat/features/auth/sign_in/screens/sign_in_screen.dart';
 import 'package:smart_flat/core/widgets/form_submit_button.dart';
 import 'package:smart_flat/features/auth/sign_up/widgets/auth_password_confirm_input.dart';
-import 'package:smart_flat/features/common/actions/show_error_snack_bar.dart';
+import 'package:smart_flat/core/actions/show_error_snack_bar.dart';
 
 class SignUpForm extends StatefulWidget {
   final VoidCallback onShowSignIn;
