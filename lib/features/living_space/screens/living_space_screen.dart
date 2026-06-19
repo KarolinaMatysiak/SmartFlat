@@ -4,6 +4,8 @@ import 'package:smart_flat/core/screens/loading_screen.dart';
 import 'package:smart_flat/core/widgets/app_background.dart';
 import 'package:smart_flat/features/auth/providers/auth_provider.dart';
 import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
+import 'package:smart_flat/features/shopping_item/screens/shopping_item_list_screen.dart';
+import 'package:smart_flat/features/shopping_item/widgets/shopping_overview_widget.dart';
 import 'package:smart_flat/features/task/widgets/tasks_overview_widget.dart';
 import 'package:smart_flat/features/living_space/widgets/living_space_members_tab.dart';
 
@@ -92,6 +94,7 @@ class _HomeTab extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.start,
         children: const [
           TasksOverviewWidget(),
+          ShoppingOverviewWidget(),
         ],
       ),
     );

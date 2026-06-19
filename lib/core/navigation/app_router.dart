@@ -7,6 +7,8 @@ import 'package:smart_flat/features/auth/sign_up/screens/sign_up_screen.dart';
 import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
 import 'package:smart_flat/features/living_space/screens/living_space_screen.dart';
 import 'package:smart_flat/features/living_space/screens/living_space_onboarding_screen.dart';
+import 'package:smart_flat/features/shopping_item/screens/create_shopping_item_screen.dart';
+import 'package:smart_flat/features/shopping_item/screens/shopping_item_list_screen.dart';
 import 'package:smart_flat/features/user_profile/providers/user_profile_provider.dart';
 import 'package:smart_flat/features/user_profile/screens/user_profile_onboarding_screen.dart';
 import 'package:smart_flat/core/screens/loading_screen.dart';
@@ -100,6 +102,16 @@ class AppRouter {
             GoRoute(
               path: 'create',
               builder: (context, state) => const CreateTaskScreen(),
+            ),
+          ],
+        ),
+        GoRoute(
+          path: '/shopping-items',
+          builder: (context, state) => const ShoppingItemsListScreen(),
+          routes: [
+            GoRoute(
+              path: 'create',
+              builder: (context, state) => const CreateShoppingItemScreen(),
             ),
           ],
         ),

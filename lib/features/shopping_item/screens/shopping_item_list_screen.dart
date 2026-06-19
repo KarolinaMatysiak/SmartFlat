@@ -5,24 +5,23 @@ import 'package:smart_flat/core/screens/loading_screen.dart';
 import 'package:smart_flat/features/auth/providers/auth_provider.dart';
 import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
 import 'package:smart_flat/features/living_space/services/living_space_service.dart';
-import 'package:smart_flat/features/task/providers/task_provider.dart';
-import 'package:smart_flat/features/task/screens/create_task_screen.dart';
+import 'package:smart_flat/features/shopping_item/providers/shopping_item_provider.dart';
+import 'package:smart_flat/features/shopping_item/screens/create_shopping_item_screen.dart';
 
-class TasksListScreen extends StatefulWidget {
-  const TasksListScreen({super.key});
+class ShoppingItemsListScreen extends StatefulWidget {
+  const ShoppingItemsListScreen({super.key});
 
   @override
-  State<TasksListScreen> createState() => _TasksListScreenState();
+  State<ShoppingItemsListScreen> createState() => _ShoppingItemsListScreenState();
 }
 
-class _TasksListScreenState extends State<TasksListScreen> {
+class _ShoppingItemsListScreenState extends State<ShoppingItemsListScreen> {
   final _livingSpaceService = LivingSpaceService();
   Map<String, String> _memberNames = {};
   bool _isLoadingMembers = true;
 
-  // Filtry
   String _statusFilter = 'all';
-  String? _memberFilter; // null (wszyscy) lub ID użytkownika
+  String? _memberFilter;
 
   @override
   void initState() {
@@ -54,12 +53,12 @@ class _TasksListScreenState extends State<TasksListScreen> {
     }
   }
 
-  void _deleteTask(String taskId) async {
+  void _deleteShoppingItem(String shoppingItemId) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Delete this task"),
-        content: const Text("Do you want to delete this task?"),
+        title: const Text("Delete item"),
+        content: const Text("Do you want to delete this item?"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
           TextButton(
@@ -72,13 +71,13 @@ class _TasksListScreenState extends State<TasksListScreen> {
     );
 
     if (confirmed == true && mounted) {
-      await context.read<TaskProvider>().deleteTask(taskId);
+      await context.read<ShoppingItemProvider>().deleteShoppingItem(shoppingItemId);
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    final taskProvider = context.watch<TaskProvider>();
+    final shoppingItemProvider = context.watch<ShoppingItemProvider>();
     final livingSpaceProvider = context.watch<LivingSpaceProvider>();
     final authProvider = context.watch<AuthProvider>();
 
@@ -100,19 +99,19 @@ class _TasksListScreenState extends State<TasksListScreen> {
         elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: (taskProvider.isLoading || _isLoadingMembers)
+      body: (shoppingItemProvider.isLoading || _isLoadingMembers)
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: [
                 _buildFilterBar(),
-                Expanded(child: _buildTasksList(context, taskProvider)),
+                Expanded(child: _buildShoppingItemsList(context, shoppingItemProvider)),
               ],
             ),
       floatingActionButton: FloatingActionButton.extended(
-        onPressed: () => context.push('/tasks/create'),
+        onPressed: () => context.push('/shopping-items/create'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text("New task", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
+        label: const Text("New item", style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
   }
@@ -162,12 +161,12 @@ class _TasksListScreenState extends State<TasksListScreen> {
     );
   }
 
-  Widget _buildTasksList(BuildContext context, TaskProvider taskProvider) {
-    if (!taskProvider.hasTasks) {
-      return _buildEmptyState("This space has no tasks yet");
+  Widget _buildShoppingItemsList(BuildContext context, ShoppingItemProvider shoppingItemProvider) {
+    if (!shoppingItemProvider.hasShoppingItems) {
+      return _buildEmptyState("This space has no shopping items yet");
     }
 
-    final filteredDocs = taskProvider.tasksSnapshot!.docs.where((doc) {
+    final filteredDocs = shoppingItemProvider.shoppingItemsSnapshot!.docs.where((doc) {
       final data = doc.data();
       final status = data['status'] ?? 'pending';
       final assignedTo = data['assignedTo'];
@@ -189,7 +188,7 @@ class _TasksListScreenState extends State<TasksListScreen> {
       itemBuilder: (context, index) {
         final doc = filteredDocs[index];
         final data = doc.data();
-        final taskId = doc.id;
+        final shoppingItemId = doc.id;
         final title = data['title'] ?? 'Bez tytułu';
         final description = data['description'] ?? '';
         final assignedTo = data['assignedTo'];
@@ -216,7 +215,7 @@ class _TasksListScreenState extends State<TasksListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 GestureDetector(
-                  onTap: () => taskProvider.toggleTaskStatus(taskId, status),
+                  onTap: () => shoppingItemProvider.toggleShoppingItemStatus(shoppingItemId, status),
                   child: Padding(
                     padding: const EdgeInsets.only(top: 2),
                     child: Icon(
@@ -278,7 +277,7 @@ class _TasksListScreenState extends State<TasksListScreen> {
                       icon: const Icon(Icons.edit_outlined, size: 20),
                       onPressed: () => Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (_) => CreateTaskScreen(taskToEdit: doc)),
+                        MaterialPageRoute(builder: (_) => CreateShoppingItemScreen(shoppingItemToEdit: doc)),
                       ),
                       constraints: const BoxConstraints(),
                       padding: const EdgeInsets.all(4),
@@ -286,7 +285,7 @@ class _TasksListScreenState extends State<TasksListScreen> {
                     ),
                     IconButton(
                       icon: const Icon(Icons.delete_outline, size: 20),
-                      onPressed: () => _deleteTask(taskId),
+                      onPressed: () => _deleteShoppingItem(shoppingItemId),
                       constraints: const BoxConstraints(),
                       padding: const EdgeInsets.all(4),
                       color: Colors.red[300],

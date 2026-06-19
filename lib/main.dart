@@ -3,6 +3,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_flat/core/navigation/app_router.dart';
 import 'package:smart_flat/features/auth/providers/auth_provider.dart';
+import 'package:smart_flat/features/shopping_item/providers/shopping_item_provider.dart';
 import 'package:smart_flat/features/task/providers/task_provider.dart';
 import 'package:smart_flat/features/user_profile/providers/user_profile_provider.dart';
 import 'features/living_space/providers/living_space_provider.dart';
@@ -25,6 +26,10 @@ void main() async {
         ),
         ChangeNotifierProxyProvider<LivingSpaceProvider, TaskProvider>(
           create: (_) => TaskProvider(),
+          update: (_, space, task) => task!..update(space.activeSpaceId),
+        ),
+        ChangeNotifierProxyProvider<LivingSpaceProvider, ShoppingItemProvider>(
+          create: (_) => ShoppingItemProvider(),
           update: (_, space, task) => task!..update(space.activeSpaceId),
         ),
       ],
