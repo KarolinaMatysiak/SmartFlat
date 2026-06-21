@@ -67,13 +67,22 @@ class TaskProvider extends ChangeNotifier {
     final uid = _auth.currentUser?.uid;
     if (uid == null || _currentSpaceId == null) return;
 
-    await _taskService.createTask(
-      createdBy: uid,
-      livingSpaceId: _currentSpaceId!,
-      title: title,
-      description: description,
-      assignedTo: assignedTo,
-    );
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _taskService.createTask(
+        createdBy: uid,
+        livingSpaceId: _currentSpaceId!,
+        title: title,
+        description: description,
+        assignedTo: assignedTo,
+      );
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> toggleTaskStatus(String taskId, String currentStatus) async {

@@ -67,13 +67,22 @@ class ShoppingItemProvider extends ChangeNotifier {
     final uid = _auth.currentUser?.uid;
     if (uid == null || _currentSpaceId == null) return;
 
-    await _shoppingItemService.createShoppingItem(
-      createdBy: uid,
-      livingSpaceId: _currentSpaceId!,
-      title: title,
-      description: description,
-      assignedTo: assignedTo,
-    );
+    _isLoading = true;
+    notifyListeners();
+
+    try {
+      await _shoppingItemService.createShoppingItem(
+        createdBy: uid,
+        livingSpaceId: _currentSpaceId!,
+        title: title,
+        description: description,
+        assignedTo: assignedTo,
+      );
+    } catch (e) {
+      _isLoading = false;
+      notifyListeners();
+      rethrow;
+    }
   }
 
   Future<void> toggleShoppingItemStatus(String shoppingItemId, String currentStatus) async {
