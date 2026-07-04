@@ -19,7 +19,18 @@ class _CreateBudgetOperationScreenState extends State<CreateBudgetOperationScree
   final _titleController = TextEditingController();
   final _amountController = TextEditingController();
   String _type = 'top-up';
+  String _category = 'Other';
   bool _isLoading = false;
+
+  final List<String> _categories = [
+    'Fixed Charges',
+    'Food',
+    'Cleaning & Household',
+    'Home Furnishings',
+    'Repairs & Maintenance',
+    'Entertainment',
+    'Other',
+  ];
 
   @override
   void dispose() {
@@ -41,6 +52,7 @@ class _CreateBudgetOperationScreenState extends State<CreateBudgetOperationScree
         title: _titleController.text.trim(),
         amount: double.parse(_amountController.text.trim()),
         type: _type,
+        category: _type == 'withdrawal' ? _category : null,
       );
 
       if (mounted) context.pop();
@@ -98,6 +110,24 @@ class _CreateBudgetOperationScreenState extends State<CreateBudgetOperationScree
                         onChanged: (val) => setState(() => _type = val!),
                       ),
                       const SizedBox(height: 16),
+                      if (_type == 'withdrawal') ...[
+                        DropdownButtonFormField<String>(
+                          value: _category,
+                          decoration: InputDecoration(
+                            labelText: 'Category',
+                            prefixIcon: Icon(Icons.category_rounded, color: cs.primary),
+                            filled: true,
+                            fillColor: Colors.white,
+                            border: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(14),
+                              borderSide: BorderSide.none,
+                            ),
+                          ),
+                          items: _categories.map((cat) => DropdownMenuItem(value: cat, child: Text(cat))).toList(),
+                          onChanged: (val) => setState(() => _category = val!),
+                        ),
+                        const SizedBox(height: 16),
+                      ],
                       FormInput(
                         controller: _titleController,
                         icon: Icons.title_rounded,

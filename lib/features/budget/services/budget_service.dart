@@ -52,6 +52,7 @@ class BudgetService {
     required String title,
     required double amount,
     required String type, // 'top-up' or 'withdrawal'
+    String? category,
   }) async {
     final budgetQuery = await _firestore
         .collection('budgets')
@@ -90,6 +91,7 @@ class BudgetService {
       'title': title,
       'amount': amount,
       'type': type,
+      'category': category,
     });
 
     await batch.commit();

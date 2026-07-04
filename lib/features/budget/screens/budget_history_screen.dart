@@ -21,6 +21,21 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
   Map<String, String> _memberNames = {};
   bool _isLoadingMembers = true;
 
+  String? _selectedMemberId;
+  String? _selectedCategory;
+  String _dateFilter = 'All time';
+
+  final List<String> _dateFilters = ['All time', 'Today', 'This week', 'This month', 'This year'];
+  final List<String> _categories = [
+    'Fixed Charges',
+    'Food',
+    'Cleaning & Household',
+    'Home Furnishings',
+    'Repairs & Maintenance',
+    'Entertainment',
+    'Other',
+  ];
+
   @override
   void initState() {
     super.initState();
@@ -79,7 +94,12 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
         child: SafeArea(
           child: (budgetProvider.isLoadingBudgetHistory || _isLoadingMembers)
               ? const Center(child: CircularProgressIndicator())
-              : _buildHistoryList(context, budgetProvider),
+              : Column(
+                  children: [
+                    _buildFilters(),
+                    Expanded(child: _buildHistoryList(context, budgetProvider)),
+                  ],
+                ),
         ),
       ),
       floatingActionButton: FloatingActionButton.extended(
@@ -92,12 +112,153 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
     );
   }
 
+  Widget _buildFilters() {
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      child: Row(
+        children: [
+          _buildFilterChip(
+            label: _dateFilter,
+            icon: Icons.calendar_today_rounded,
+            onTap: _showDateFilterPicker,
+          ),
+          const SizedBox(width: 8),
+          _buildFilterChip(
+            label: _selectedMemberId == null ? 'All People' : (_memberNames[_selectedMemberId] ?? 'Person'),
+            icon: Icons.person_rounded,
+            onTap: _showMemberFilterPicker,
+          ),
+          const SizedBox(width: 8),
+          _buildFilterChip(
+            label: _selectedCategory ?? 'All Categories',
+            icon: Icons.category_rounded,
+            onTap: _showCategoryFilterPicker,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildFilterChip({required String label, required IconData icon, required VoidCallback onTap}) {
+    return ActionChip(
+      avatar: Icon(icon, size: 16),
+      label: Text(label),
+      onPressed: onTap,
+      backgroundColor: Colors.white.withOpacity(0.8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+    );
+  }
+
+  void _showDateFilterPicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ListView(
+        shrinkWrap: true,
+        children: _dateFilters.map((f) => ListTile(
+          title: Text(f),
+          onTap: () {
+            setState(() => _dateFilter = f);
+            Navigator.pop(context);
+          },
+          selected: _dateFilter == f,
+        )).toList(),
+      ),
+    );
+  }
+
+  void _showMemberFilterPicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ListView(
+        shrinkWrap: true,
+        children: [
+          ListTile(
+            title: const Text('All People'),
+            onTap: () {
+              setState(() => _selectedMemberId = null);
+              Navigator.pop(context);
+            },
+            selected: _selectedMemberId == null,
+          ),
+          ..._memberNames.entries.map((e) => ListTile(
+            title: Text(e.value),
+            onTap: () {
+              setState(() => _selectedMemberId = e.key);
+              Navigator.pop(context);
+            },
+            selected: _selectedMemberId == e.key,
+          )),
+        ],
+      ),
+    );
+  }
+
+  void _showCategoryFilterPicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ListView(
+        shrinkWrap: true,
+        children: [
+          ListTile(
+            title: const Text('All Categories'),
+            onTap: () {
+              setState(() => _selectedCategory = null);
+              Navigator.pop(context);
+            },
+            selected: _selectedCategory == null,
+          ),
+          ..._categories.map((c) => ListTile(
+            title: Text(c),
+            onTap: () {
+              setState(() => _selectedCategory = c);
+              Navigator.pop(context);
+            },
+            selected: _selectedCategory == c,
+          )),
+        ],
+      ),
+    );
+  }
+
   Widget _buildHistoryList(BuildContext context, BudgetProvider budgetProvider) {
     if (!budgetProvider.hasBudgetHistory) {
       return _buildEmptyState("No operations yet");
     }
 
-    final historyDocs = budgetProvider.budgetHistorySnapshot!.docs;
+    var historyDocs = budgetProvider.budgetHistorySnapshot!.docs.where((doc) {
+      final data = doc.data();
+      final createdAt = data['createdAt']?.toDate() as DateTime?;
+      final createdBy = data['createdBy'] as String?;
+      final category = data['category'] as String?;
+
+      // Filter by Member
+      if (_selectedMemberId != null && createdBy != _selectedMemberId) return false;
+
+      // Filter by Category
+      if (_selectedCategory != null && category != _selectedCategory) return false;
+
+      // Filter by Date
+      if (createdAt == null) return true;
+      final now = DateTime.now();
+      switch (_dateFilter) {
+        case 'Today':
+          return createdAt.year == now.year && createdAt.month == now.month && createdAt.day == now.day;
+        case 'This week':
+          final startOfWeek = now.subtract(Duration(days: now.weekday - 1));
+          return createdAt.isAfter(DateTime(startOfWeek.year, startOfWeek.month, startOfWeek.day));
+        case 'This month':
+          return createdAt.year == now.year && createdAt.month == now.month;
+        case 'This year':
+          return createdAt.year == now.year;
+        default:
+          return true;
+      }
+    }).toList();
+
+    if (historyDocs.isEmpty) {
+      return _buildEmptyState("No matching operations");
+    }
 
     return ListView.separated(
       padding: const EdgeInsets.fromLTRB(16, 8, 16, 80),
@@ -109,6 +270,7 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
         final title = data['title'] ?? 'No title';
         final amount = (data['amount'] ?? 0.0).toDouble();
         final type = data['type'] ?? 'top-up';
+        final category = data['category'];
         final createdBy = data['createdBy'];
         final createdAt = data['createdAt']?.toDate();
         final creatorName = _memberNames[createdBy] ?? 'Unknown';
@@ -142,6 +304,18 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
                           color: Colors.black87,
                         ),
                       ),
+                      if (category != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 2.0),
+                          child: Text(
+                            category,
+                            style: TextStyle(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
+                          ),
+                        ),
                       const SizedBox(height: 4),
                       Text(
                         '$creatorName • $dateStr',

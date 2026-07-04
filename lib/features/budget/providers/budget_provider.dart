@@ -91,6 +91,7 @@ class BudgetProvider extends ChangeNotifier {
     required String title,
     required double amount,
     required String type,
+    String? category,
   }) async {
     if (_currentSpaceId == null) return;
     await _budgetService.addBudgetOperation(
@@ -99,6 +100,7 @@ class BudgetProvider extends ChangeNotifier {
       title: title,
       amount: amount,
       type: type,
+      category: category,
     );
     // After adding an operation we don't need to do anything else,
     // because the stream should deliver the data itself, but let's make sure
