@@ -1,10 +1,12 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:smart_flat/features/budget/services/budget_service.dart';
 import 'package:smart_flat/features/living_space/services/living_space_service.dart';
 
 class LivingSpaceProvider extends ChangeNotifier {
   final LivingSpaceService _livingSpaceService = LivingSpaceService();
+  final BudgetService _budgetService = BudgetService();
 
   QuerySnapshot<Map<String, dynamic>>? _spacesSnapshot;
   StreamSubscription? _spacesSubscription;
@@ -63,10 +65,11 @@ class LivingSpaceProvider extends ChangeNotifier {
     required String createdBy,
     required String name,
   }) async {
-    await _livingSpaceService.createLivingSpace(
+    final livingSpaceId = await _livingSpaceService.createLivingSpace(
       createdBy: createdBy,
       name: name,
     );
+    await _budgetService.createBudget(livingSpaceId: livingSpaceId);
   }
 
   @override

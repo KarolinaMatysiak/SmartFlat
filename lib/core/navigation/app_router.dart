@@ -12,6 +12,8 @@ import 'package:smart_flat/features/shopping_item/screens/shopping_item_list_scr
 import 'package:smart_flat/features/user_profile/providers/user_profile_provider.dart';
 import 'package:smart_flat/features/user_profile/screens/user_profile_onboarding_screen.dart';
 import 'package:smart_flat/core/screens/loading_screen.dart';
+import 'package:smart_flat/features/budget/screens/budget_history_screen.dart';
+import 'package:smart_flat/features/budget/screens/create_budget_operation_screen.dart';
 import 'package:smart_flat/features/task/screens/tasks_list_screen.dart';
 import 'package:smart_flat/features/task/screens/create_task_screen.dart';
 
@@ -112,6 +114,16 @@ class AppRouter {
             GoRoute(
               path: 'create',
               builder: (context, state) => const CreateShoppingItemScreen(),
+            ),
+          ],
+        ),
+        GoRoute(
+          path: '/budget',
+          builder: (context, state) => const BudgetHistoryScreen(),
+          routes: [
+            GoRoute(
+              path: 'add',
+              builder: (context, state) => const CreateBudgetOperationScreen(),
             ),
           ],
         ),

@@ -27,7 +27,7 @@ class LivingSpaceService {
         .snapshots();
   }
 
-  Future<void> createLivingSpace({
+  Future<String> createLivingSpace({
     required String createdBy,
     required String name,
   }) async {
@@ -39,6 +39,7 @@ class LivingSpaceService {
       'createdAt': FieldValue.serverTimestamp(),
       'memberIds': [createdBy],
     });
+    return docRef.id;
   }
 
   Future<List<Map<String, dynamic>>> getMembers(List<String> memberIds) async {

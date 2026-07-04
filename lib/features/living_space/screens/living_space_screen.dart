@@ -3,8 +3,10 @@ import 'package:provider/provider.dart';
 import 'package:smart_flat/core/screens/loading_screen.dart';
 import 'package:smart_flat/core/widgets/app_background.dart';
 import 'package:smart_flat/features/auth/providers/auth_provider.dart';
+import 'package:smart_flat/features/budget/providers/budget_provider.dart';
 import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
 import 'package:smart_flat/features/shopping_item/screens/shopping_item_list_screen.dart';
+import 'package:smart_flat/features/budget/widgets/budget_overview_widget.dart';
 import 'package:smart_flat/features/shopping_item/widgets/shopping_overview_widget.dart';
 import 'package:smart_flat/features/task/widgets/tasks_overview_widget.dart';
 import 'package:smart_flat/features/living_space/widgets/living_space_members_tab.dart';
@@ -23,6 +25,7 @@ class _LivingSpaceScreenState extends State<LivingSpaceScreen> {
   Widget build(BuildContext context) {
     final spaceProvider = context.watch<LivingSpaceProvider>();
     final authProvider = context.watch<AuthProvider>();
+    final budgetProvider = context.watch<BudgetProvider>();
 
     if (!authProvider.isAuthenticated || spaceProvider.spacesSnapshot == null || spaceProvider.isLoading) {
       return const LoadingScreen();
@@ -36,6 +39,13 @@ class _LivingSpaceScreenState extends State<LivingSpaceScreen> {
     final firstSpaceData = firstSpaceDoc.data();
     final spaceName = firstSpaceData['name'] ?? 'Mój Smart Flat';
     final spaceId = firstSpaceDoc.id;
+
+    // Initialize budget provider for this space
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.mounted) {
+        context.read<BudgetProvider>().setCurrentSpaceId(spaceId);
+      }
+    });
 
     final List<Widget> _tabs = [
       const _HomeTab(),
@@ -87,13 +97,16 @@ class _HomeTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
+    return SingleChildScrollView(
       padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
         children: const [
+          BudgetOverviewWidget(),
+          SizedBox(height: 16),
           TasksOverviewWidget(),
+          SizedBox(height: 16),
           ShoppingOverviewWidget(),
         ],
       ),
