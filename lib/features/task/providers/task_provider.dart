@@ -27,6 +27,10 @@ class TaskProvider extends ChangeNotifier {
 
   bool get hasUserTasks => userTasks.isNotEmpty;
 
+  bool get hasPendingUserTasks {
+    return userTasks.any((doc) => doc.data()['status'] == 'pending');
+  }
+
   void update(String? spaceId) {
     if (spaceId == null) {
       clear();

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:smart_flat/core/screens/loading_screen.dart';
 import 'package:smart_flat/core/widgets/app_background.dart';
@@ -10,6 +11,7 @@ import 'package:smart_flat/features/budget/widgets/budget_overview_widget.dart';
 import 'package:smart_flat/features/shopping_item/widgets/shopping_overview_widget.dart';
 import 'package:smart_flat/features/task/widgets/tasks_overview_widget.dart';
 import 'package:smart_flat/features/living_space/widgets/living_space_members_tab.dart';
+import 'package:smart_flat/features/motivation/widgets/motivator_pet.dart';
 
 class LivingSpaceScreen extends StatefulWidget {
   const LivingSpaceScreen({super.key});
@@ -55,57 +57,59 @@ class _LivingSpaceScreenState extends State<LivingSpaceScreen> {
       ),
     ];
 
-    return Scaffold(
-      backgroundColor: Colors.transparent,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        title: Text(spaceName, style: const TextStyle(fontWeight: FontWeight.bold)),
+    return AppBackground(
+      child: Scaffold(
         backgroundColor: Colors.transparent,
-        elevation: 0,
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.logout),
-            onPressed: () => context.read<AuthProvider>().signOut(),
-          ),
-        ],
-      ),
-      body: AppBackground(
-        child: SafeArea(
-          child: _tabs[_selectedIndex],
-        ),
-      ),
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          color: Colors.white.withOpacity(0.9),
-          border: Border(
-            top: BorderSide(
-              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-              width: 1,
-            ),
-          ),
-        ),
-        child: BottomNavigationBar(
-          currentIndex: _selectedIndex,
-          onTap: (index) => setState(() => _selectedIndex = index),
-          elevation: 0,
+        extendBodyBehindAppBar: true,
+        extendBody: true,
+        appBar: AppBar(
+          title: Text(spaceName, style: const TextStyle(fontWeight: FontWeight.bold)),
           backgroundColor: Colors.transparent,
-          selectedItemColor: Theme.of(context).colorScheme.primary,
-          unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
-          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
-          type: BottomNavigationBarType.fixed,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home_rounded),
-              activeIcon: Icon(Icons.home_rounded),
-              label: 'Dashboard',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.people_outline_rounded),
-              activeIcon: Icon(Icons.people_rounded),
-              label: 'Members',
+          elevation: 0,
+          actions: [
+            IconButton(
+              icon: const Icon(Icons.logout),
+              onPressed: () => context.read<AuthProvider>().signOut(),
             ),
           ],
+        ),
+        body: SafeArea(
+          bottom: false, // Background flows under navigation bar
+          child: _tabs[_selectedIndex],
+        ),
+        bottomNavigationBar: Container(
+          decoration: BoxDecoration(
+            color: Colors.white.withOpacity(0.9),
+            border: Border(
+              top: BorderSide(
+                color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+                width: 1,
+              ),
+            ),
+          ),
+          child: BottomNavigationBar(
+            currentIndex: _selectedIndex,
+            onTap: (index) => setState(() => _selectedIndex = index),
+            elevation: 0,
+            backgroundColor: Colors.transparent,
+            selectedItemColor: Theme.of(context).colorScheme.primary,
+            unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+            selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+            unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+            type: BottomNavigationBarType.fixed,
+            items: const [
+              BottomNavigationBarItem(
+                icon: Icon(Icons.home_rounded),
+                activeIcon: Icon(Icons.home_rounded),
+                label: 'Dashboard',
+              ),
+              BottomNavigationBarItem(
+                icon: Icon(Icons.people_outline_rounded),
+                activeIcon: Icon(Icons.people_rounded),
+                label: 'Members',
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -122,12 +126,13 @@ class _HomeTab extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         mainAxisAlignment: MainAxisAlignment.start,
-        children: const [
-          BudgetOverviewWidget(),
-          SizedBox(height: 16),
-          TasksOverviewWidget(),
-          SizedBox(height: 16),
-          ShoppingOverviewWidget(),
+        children: [
+          MotivatorPet(),
+          const BudgetOverviewWidget(),
+          const SizedBox(height: 16),
+          const TasksOverviewWidget(),
+          const SizedBox(height: 16),
+          const ShoppingOverviewWidget(),
         ],
       ),
     );
