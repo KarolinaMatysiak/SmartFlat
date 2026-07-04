@@ -104,7 +104,8 @@ class _LivingSpaceMembersTabState extends State<LivingSpaceMembersTab> {
       return const Center(child: CircularProgressIndicator());
     }
 
-    return Padding(
+    return SingleChildScrollView(
+      physics: const AlwaysScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16.0),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -123,36 +124,40 @@ class _LivingSpaceMembersTabState extends State<LivingSpaceMembersTab> {
             ],
           ),
           const SizedBox(height: 16),
-          Expanded(
-            child: _members == null || _members!.isEmpty
-                ? const Center(child: Text('No members found'))
-                : ListView.separated(
-                    itemCount: _members!.length,
-                    separatorBuilder: (context, index) => const SizedBox(height: 8),
-                    itemBuilder: (context, index) {
-                      final member = _members![index];
-                      final name = member['firstName'] ?? 'User';
-                      final userName = member['userName'] ?? 'unknown';
+          if (_members == null || _members!.isEmpty)
+            const SizedBox(
+              height: 100,
+              child: Center(child: Text('No members found')),
+            )
+          else
+            ListView.separated(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: _members!.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final member = _members![index];
+                final name = member['firstName'] ?? 'User';
+                final userName = member['userName'] ?? 'unknown';
 
-                      return Card(
-                        color: Colors.white.withOpacity(0.7),
-                        child: ListTile(
-                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-                          leading: CircleAvatar(
-                            backgroundColor: cs.primary.withOpacity(0.1),
-                            child: Text(
-                              name[0].toUpperCase(),
-                              style: TextStyle(color: cs.primary, fontWeight: FontWeight.bold),
-                            ),
-                          ),
-                          title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
-                          subtitle: Text('@$userName', style: TextStyle(color: cs.onSurface.withOpacity(0.6))),
-                        ),
-                      );
-                    },
+                return Card(
+                  color: Colors.white.withOpacity(0.7),
+                  child: ListTile(
+                    contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    leading: CircleAvatar(
+                      backgroundColor: cs.primary.withOpacity(0.1),
+                      child: Text(
+                        name[0].toUpperCase(),
+                        style: TextStyle(color: cs.primary, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                    title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                    subtitle: Text('@$userName', style: TextStyle(color: cs.onSurface.withOpacity(0.6))),
                   ),
-          ),
-          const SizedBox(height: 16),
+                );
+              },
+            ),
+          const SizedBox(height: 24),
           Container(
             height: 52,
             decoration: BoxDecoration(
@@ -180,6 +185,8 @@ class _LivingSpaceMembersTabState extends State<LivingSpaceMembersTab> {
               ),
             ),
           ),
+          // Spacer for navigation bar
+          SizedBox(height: MediaQuery.of(context).padding.bottom + 100),
         ],
       ),
     );

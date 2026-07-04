@@ -19,8 +19,10 @@ void main() async {
     const SystemUiOverlayStyle(
       systemNavigationBarColor: Colors.transparent,
       systemNavigationBarIconBrightness: Brightness.dark,
+      systemNavigationBarContrastEnforced: false, // Disable enforced contrast for true transparency
       statusBarColor: Colors.transparent,
       statusBarIconBrightness: Brightness.dark,
+      systemStatusBarContrastEnforced: false,
     ),
   );
 
