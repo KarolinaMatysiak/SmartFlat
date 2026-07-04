@@ -24,8 +24,11 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
   String? _selectedMemberId;
   String? _selectedCategory;
   String _dateFilter = 'All time';
+  String _typeFilter = 'All types';
+  DateTimeRange? _customDateRange;
 
-  final List<String> _dateFilters = ['All time', 'Today', 'This week', 'This month', 'This year'];
+  final List<String> _dateFilters = ['All time', 'Today', 'This week', 'This month', 'This year', 'Other'];
+  final List<String> _typeFilters = ['All types', 'Income', 'Expenses'];
   final List<String> _categories = [
     'Fixed Charges',
     'Food',
@@ -113,40 +116,103 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
   }
 
   Widget _buildFilters() {
+    String dateLabel = _dateFilter;
+    if (_dateFilter == 'Other' && _customDateRange != null) {
+      dateLabel = '${DateFormat('dd.MM').format(_customDateRange!.start)} - ${DateFormat('dd.MM').format(_customDateRange!.end)}';
+    }
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
           _buildFilterChip(
-            label: _dateFilter,
+            label: dateLabel,
             icon: Icons.calendar_today_rounded,
             onTap: _showDateFilterPicker,
+            isActive: _dateFilter != 'All time',
+            onClear: () => setState(() {
+              _dateFilter = 'All time';
+              _customDateRange = null;
+            }),
+          ),
+          const SizedBox(width: 8),
+          _buildFilterChip(
+            label: _typeFilter,
+            icon: Icons.swap_vert_rounded,
+            onTap: _showTypeFilterPicker,
+            isActive: _typeFilter != 'All types',
+            onClear: () => setState(() => _typeFilter = 'All types'),
           ),
           const SizedBox(width: 8),
           _buildFilterChip(
             label: _selectedMemberId == null ? 'All People' : (_memberNames[_selectedMemberId] ?? 'Person'),
             icon: Icons.person_rounded,
             onTap: _showMemberFilterPicker,
+            isActive: _selectedMemberId != null,
+            onClear: () => setState(() => _selectedMemberId = null),
           ),
           const SizedBox(width: 8),
           _buildFilterChip(
             label: _selectedCategory ?? 'All Categories',
             icon: Icons.category_rounded,
             onTap: _showCategoryFilterPicker,
+            isActive: _selectedCategory != null,
+            onClear: () => setState(() => _selectedCategory = null),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildFilterChip({required String label, required IconData icon, required VoidCallback onTap}) {
-    return ActionChip(
-      avatar: Icon(icon, size: 16),
-      label: Text(label),
+  Widget _buildFilterChip({
+    required String label,
+    required IconData icon,
+    required VoidCallback onTap,
+    bool isActive = false,
+    VoidCallback? onClear,
+  }) {
+    final cs = Theme.of(context).colorScheme;
+    return InputChip(
+      avatar: Icon(
+        icon,
+        size: 16,
+        color: isActive ? Colors.white : cs.primary,
+      ),
+      label: Text(
+        label,
+        style: TextStyle(
+          color: isActive ? Colors.white : Colors.black87,
+          fontWeight: isActive ? FontWeight.bold : FontWeight.normal,
+        ),
+      ),
       onPressed: onTap,
-      backgroundColor: Colors.white.withOpacity(0.8),
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+      onDeleted: isActive ? onClear : null,
+      deleteIcon: const Icon(Icons.close_rounded, size: 14, color: Colors.white),
+      backgroundColor: isActive ? cs.primary : Colors.white.withOpacity(0.8),
+      selectedColor: cs.primary,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(20),
+        side: BorderSide(color: isActive ? cs.primary : Colors.transparent),
+      ),
+      showCheckmark: false,
+    );
+  }
+
+  void _showTypeFilterPicker() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => ListView(
+        shrinkWrap: true,
+        children: _typeFilters.map((f) => ListTile(
+          title: Text(f),
+          onTap: () {
+            setState(() => _typeFilter = f);
+            Navigator.pop(context);
+          },
+          selected: _typeFilter == f,
+        )).toList(),
+      ),
     );
   }
 
@@ -157,9 +223,28 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
         shrinkWrap: true,
         children: _dateFilters.map((f) => ListTile(
           title: Text(f),
-          onTap: () {
-            setState(() => _dateFilter = f);
-            Navigator.pop(context);
+          onTap: () async {
+            if (f == 'Other') {
+              Navigator.pop(context);
+              final picked = await showDateRangePicker(
+                context: context,
+                firstDate: DateTime(2020),
+                lastDate: DateTime.now(),
+                initialDateRange: _customDateRange,
+              );
+              if (picked != null) {
+                setState(() {
+                  _dateFilter = 'Other';
+                  _customDateRange = picked;
+                });
+              }
+            } else {
+              setState(() {
+                _dateFilter = f;
+                _customDateRange = null;
+              });
+              Navigator.pop(context);
+            }
           },
           selected: _dateFilter == f,
         )).toList(),
@@ -231,6 +316,13 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
       final createdAt = data['createdAt']?.toDate() as DateTime?;
       final createdBy = data['createdBy'] as String?;
       final category = data['category'] as String?;
+      final type = data['type'] as String?;
+
+      // Filter by Type
+      if (_typeFilter != 'All types') {
+        final expectedType = _typeFilter == 'Income' ? 'top-up' : 'withdrawal';
+        if (type != expectedType) return false;
+      }
 
       // Filter by Member
       if (_selectedMemberId != null && createdBy != _selectedMemberId) return false;
@@ -251,6 +343,10 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
           return createdAt.year == now.year && createdAt.month == now.month;
         case 'This year':
           return createdAt.year == now.year;
+        case 'Other':
+          if (_customDateRange == null) return true;
+          return createdAt.isAfter(_customDateRange!.start.subtract(const Duration(seconds: 1))) &&
+              createdAt.isBefore(_customDateRange!.end.add(const Duration(days: 1)));
         default:
           return true;
       }
