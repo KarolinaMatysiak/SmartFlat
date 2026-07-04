@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import 'package:smart_flat/core/screens/loading_screen.dart';
+import 'package:smart_flat/core/widgets/app_background.dart';
 import 'package:smart_flat/features/auth/providers/auth_provider.dart';
 import 'package:smart_flat/features/budget/providers/budget_provider.dart';
 import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
@@ -37,7 +38,7 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
           setState(() {
             _memberNames = {
               for (var m in members)
-                m['createdBy']: m['firstName'] ?? m['userName'] ?? 'Użytkownik'
+                m['createdBy']: m['firstName'] ?? m['userName'] ?? 'User'
             };
             _isLoadingMembers = false;
           });
@@ -67,22 +68,25 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
     final livingSpaceName = docs.first.data()['name'] ?? '';
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
-        title: Text('Historia - $livingSpaceName',
+        title: Text('History - $livingSpaceName',
             style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.5)),
         centerTitle: true,
-        elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: (budgetProvider.isLoadingBudgetHistory || _isLoadingMembers)
-          ? const Center(child: CircularProgressIndicator())
-          : _buildHistoryList(context, budgetProvider),
+      extendBodyBehindAppBar: true,
+      body: AppBackground(
+        child: SafeArea(
+          child: (budgetProvider.isLoadingBudgetHistory || _isLoadingMembers)
+              ? const Center(child: CircularProgressIndicator())
+              : _buildHistoryList(context, budgetProvider),
+        ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/budget/add'),
         backgroundColor: Theme.of(context).colorScheme.primary,
         icon: const Icon(Icons.add, color: Colors.white),
-        label: const Text("Nowa operacja",
+        label: const Text("New operation",
             style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold)),
       ),
     );
@@ -90,7 +94,7 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
 
   Widget _buildHistoryList(BuildContext context, BudgetProvider budgetProvider) {
     if (!budgetProvider.hasBudgetHistory) {
-      return _buildEmptyState("Brak historii operacji");
+      return _buildEmptyState("No operations yet");
     }
 
     final historyDocs = budgetProvider.budgetHistorySnapshot!.docs;
@@ -102,29 +106,18 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
       itemBuilder: (context, index) {
         final doc = historyDocs[index];
         final data = doc.data();
-        final title = data['title'] ?? 'Brak tytułu';
+        final title = data['title'] ?? 'No title';
         final amount = (data['amount'] ?? 0.0).toDouble();
         final type = data['type'] ?? 'top-up';
         final createdBy = data['createdBy'];
         final createdAt = data['createdAt']?.toDate();
-        final creatorName = _memberNames[createdBy] ?? 'Nieznany';
+        final creatorName = _memberNames[createdBy] ?? 'Unknown';
 
         final isTopUp = type == 'top-up';
         final dateStr = createdAt != null ? DateFormat('dd.MM.yyyy HH:mm').format(createdAt) : '';
 
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.grey.withOpacity(0.15)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+        return Card(
+          color: Colors.white.withOpacity(0.8),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -154,7 +147,7 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
                         '$creatorName • $dateStr',
                         style: TextStyle(
                           fontSize: 12,
-                          color: Colors.grey[500],
+                          color: Colors.grey[600],
                         ),
                       ),
                     ],
@@ -181,11 +174,12 @@ class _BudgetHistoryScreenState extends State<BudgetHistoryScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.history_rounded, size: 64, color: Colors.grey[300]),
+          Icon(Icons.history_rounded, size: 64, color: Colors.grey.withOpacity(0.5)),
           const SizedBox(height: 16),
-          Text(message, style: const TextStyle(color: Colors.grey, fontSize: 16)),
+          Text(message, style: TextStyle(color: Colors.grey[600], fontSize: 16)),
         ],
       ),
     );
   }
 }
+

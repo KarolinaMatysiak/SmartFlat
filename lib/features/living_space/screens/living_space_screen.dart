@@ -37,7 +37,7 @@ class _LivingSpaceScreenState extends State<LivingSpaceScreen> {
 
     final firstSpaceDoc = spaceProvider.spacesSnapshot!.docs.first;
     final firstSpaceData = firstSpaceDoc.data();
-    final spaceName = firstSpaceData['name'] ?? 'Mój Smart Flat';
+    final spaceName = firstSpaceData['name'] ?? 'My Smart Flat';
     final spaceId = firstSpaceDoc.id;
 
     // Initialize budget provider for this space
@@ -74,19 +74,39 @@ class _LivingSpaceScreenState extends State<LivingSpaceScreen> {
           child: _tabs[_selectedIndex],
         ),
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
-        items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
+      bottomNavigationBar: Container(
+        decoration: BoxDecoration(
+          color: Colors.white.withOpacity(0.9),
+          border: Border(
+            top: BorderSide(
+              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
+              width: 1,
+            ),
           ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.people),
-            label: 'Members',
-          ),
-        ],
+        ),
+        child: BottomNavigationBar(
+          currentIndex: _selectedIndex,
+          onTap: (index) => setState(() => _selectedIndex = index),
+          elevation: 0,
+          backgroundColor: Colors.transparent,
+          selectedItemColor: Theme.of(context).colorScheme.primary,
+          unselectedItemColor: Theme.of(context).colorScheme.onSurface.withOpacity(0.4),
+          selectedLabelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
+          unselectedLabelStyle: const TextStyle(fontWeight: FontWeight.w500, fontSize: 12),
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home_rounded),
+              activeIcon: Icon(Icons.home_rounded),
+              label: 'Dashboard',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.people_outline_rounded),
+              activeIcon: Icon(Icons.people_rounded),
+              label: 'Members',
+            ),
+          ],
+        ),
       ),
     );
   }

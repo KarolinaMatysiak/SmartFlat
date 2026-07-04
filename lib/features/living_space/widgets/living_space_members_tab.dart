@@ -98,6 +98,8 @@ class _LivingSpaceMembersTabState extends State<LivingSpaceMembersTab> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+
     if (_loadingMembers) {
       return const Center(child: CircularProgressIndicator());
     }
@@ -107,11 +109,18 @@ class _LivingSpaceMembersTabState extends State<LivingSpaceMembersTab> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Text(
-            'Members',
-            style: Theme.of(
-              context,
-            ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
+          Row(
+            children: [
+              Icon(Icons.group_outlined, color: cs.primary),
+              const SizedBox(width: 8),
+              Text(
+                'Space Members',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: cs.onSurface,
+                    ),
+              ),
+            ],
           ),
           const SizedBox(height: 16),
           Expanded(
@@ -119,30 +128,55 @@ class _LivingSpaceMembersTabState extends State<LivingSpaceMembersTab> {
                 ? const Center(child: Text('No members found'))
                 : ListView.separated(
                     itemCount: _members!.length,
-                    separatorBuilder: (context, index) => const Divider(),
+                    separatorBuilder: (context, index) => const SizedBox(height: 8),
                     itemBuilder: (context, index) {
                       final member = _members![index];
-                      return ListTile(
-                        leading: CircleAvatar(
-                          child: Text(
-                            (member['firstName'] ?? 'U')[0].toUpperCase(),
+                      final name = member['firstName'] ?? 'User';
+                      final userName = member['userName'] ?? 'unknown';
+
+                      return Card(
+                        color: Colors.white.withOpacity(0.7),
+                        child: ListTile(
+                          contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                          leading: CircleAvatar(
+                            backgroundColor: cs.primary.withOpacity(0.1),
+                            child: Text(
+                              name[0].toUpperCase(),
+                              style: TextStyle(color: cs.primary, fontWeight: FontWeight.bold),
+                            ),
                           ),
+                          title: Text(name, style: const TextStyle(fontWeight: FontWeight.w600)),
+                          subtitle: Text('@$userName', style: TextStyle(color: cs.onSurface.withOpacity(0.6))),
                         ),
-                        title: Text(member['firstName'] ?? 'Unknown'),
-                        subtitle: Text('@${member['userName'] ?? 'unknown'}'),
                       );
                     },
                   ),
           ),
           const SizedBox(height: 16),
-          ElevatedButton.icon(
-            onPressed: _generateInviteCode,
-            icon: const Icon(Icons.person_add),
-            label: const Text('INVITE PERSON'),
-            style: ElevatedButton.styleFrom(
-              padding: const EdgeInsets.symmetric(vertical: 16),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+          Container(
+            height: 52,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(14),
+              gradient: LinearGradient(colors: [cs.primary, cs.secondary]),
+              boxShadow: [
+                BoxShadow(
+                  color: cs.primary.withOpacity(0.3),
+                  blurRadius: 8,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: ElevatedButton.icon(
+              onPressed: _generateInviteCode,
+              icon: const Icon(Icons.person_add_alt_1_rounded, color: Colors.white),
+              label: const Text(
+                'INVITE PERSON',
+                style: TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.transparent,
+                shadowColor: Colors.transparent,
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
               ),
             ),
           ),
@@ -151,3 +185,4 @@ class _LivingSpaceMembersTabState extends State<LivingSpaceMembersTab> {
     );
   }
 }
+

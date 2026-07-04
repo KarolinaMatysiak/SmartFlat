@@ -11,70 +11,61 @@ class ShoppingOverviewWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final taskProvider = context.watch<ShoppingItemProvider>();
-    final double widgetHeight = MediaQuery.of(context).size.height / 3;
+    final shoppingProvider = context.watch<ShoppingItemProvider>();
+    final cs = Theme.of(context).colorScheme;
 
-    return SizedBox(
-      height: widgetHeight,
-      width: double.infinity,
-      child: Card(
-        margin: EdgeInsets.zero,
-        elevation: 0,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-          side: BorderSide(
-            color: Colors.grey.withOpacity(0.15),
-            width: 1,
-          ),
-        ),
-        shadowColor: Colors.black.withOpacity(0.04),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(28),
-          onTap: () => context.push('/shopping-items'),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: _buildContent(context, taskProvider),
-          ),
+    return Card(
+      elevation: 0,
+      color: Colors.white.withOpacity(0.8),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(24),
+      ),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(24),
+        onTap: () => context.push('/shopping-items'),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: _buildContent(context, shoppingProvider, cs),
         ),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, ShoppingItemProvider taskProvider) {
-    if (taskProvider.isLoading) {
-      return const LoadingWidget();
+  Widget _buildContent(BuildContext context, ShoppingItemProvider shoppingProvider, ColorScheme cs) {
+    if (shoppingProvider.isLoading) {
+      return const SizedBox(
+        height: 100,
+        child: LoadingWidget(),
+      );
     }
 
-    final userDocs = taskProvider.userShoppingItems;
+    final userDocs = shoppingProvider.userShoppingItems;
     final totalShoppingCount = userDocs.length;
     final displayDocs = userDocs.take(displayedShoppingLimit).toList();
 
     return Column(
+      mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildHeader(totalShoppingCount),
+        _buildHeader(totalShoppingCount, cs),
 
         const SizedBox(height: 16),
 
-        if (!taskProvider.hasUserShoppingItems)
-          Expanded(
-            child: _buildEmptyState(),
-          )
+        if (!shoppingProvider.hasUserShoppingItems)
+          _buildEmptyState(cs)
         else
-          Expanded(
-            child: _buildShoppingList(context, displayDocs),
-          ),
+          _buildShoppingList(context, displayDocs, cs),
 
-        if (taskProvider.hasShoppingItems && totalShoppingCount > displayedShoppingLimit)
+        if (shoppingProvider.hasShoppingItems && totalShoppingCount > displayedShoppingLimit)
           Padding(
-            padding: const EdgeInsets.only(top: 8.0),
+            padding: const EdgeInsets.only(top: 12.0),
             child: Center(
               child: Text(
-                '+${totalShoppingCount - displayedShoppingLimit} more',
-                style: const TextStyle(
+                '+${totalShoppingCount - displayedShoppingLimit} more items',
+                style: TextStyle(
                   fontSize: 12,
                   fontWeight: FontWeight.bold,
+                  color: cs.secondary.withOpacity(0.7),
                   letterSpacing: -0.4,
                 ),
               ),
@@ -84,127 +75,113 @@ class ShoppingOverviewWidget extends StatelessWidget {
     );
   }
 
-  Widget _buildHeader(int totalShoppingCount) {
+  Widget _buildHeader(int totalShoppingCount, ColorScheme cs) {
     return Row(
-      mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        const Row(
-          children: [
-            Icon(
-              Icons.format_list_bulleted,
-              color: Colors.blue,
-              size: 22,
+        Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            color: cs.secondary.withOpacity(0.1),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Icon(
+            Icons.shopping_cart_rounded,
+            color: cs.secondary,
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(
+          'Shopping List',
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: cs.onSurface,
+          ),
+        ),
+        const Spacer(),
+        if (totalShoppingCount > 0)
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: cs.secondary.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12),
             ),
-            SizedBox(width: 8),
-            Text(
-              'Shopping',
+            child: Text(
+              '$totalShoppingCount',
               style: TextStyle(
-                fontSize: 18,
+                color: cs.secondary,
+                fontSize: 12,
                 fontWeight: FontWeight.bold,
-                letterSpacing: -0.4,
               ),
             ),
-          ],
-        ),
-        if (totalShoppingCount > 0)
-          Text(
-            '$totalShoppingCount',
-            style: TextStyle(
-              color: Colors.grey,
-              fontWeight: FontWeight.w600,
-            ),
           ),
+        const SizedBox(width: 8),
+        Icon(Icons.chevron_right_rounded, color: cs.onSurface.withOpacity(0.3)),
       ],
     );
   }
 
-  Widget _buildEmptyState() {
-    return Center(
-      child: Text(
-        'There are no items to be bought by you for today!\nEnjoy your free time.',
-        textAlign: TextAlign.center,
-        style: TextStyle(
-          color: Colors.grey.shade500,
-          fontSize: 15,
-          fontWeight: FontWeight.w500,
-          letterSpacing: -0.2,
+  Widget _buildEmptyState(ColorScheme cs) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 20),
+      child: Center(
+        child: Text(
+          'Nothing to buy today!\nList is empty.',
+          textAlign: TextAlign.center,
+          style: TextStyle(
+            color: cs.onSurface.withOpacity(0.5),
+            fontSize: 14,
+            fontWeight: FontWeight.w500,
+          ),
         ),
       ),
     );
   }
 
-  Widget _buildShoppingList(BuildContext context, List displayDocs) {
-    return ListView.separated(
-      padding: EdgeInsets.zero,
-      physics: const NeverScrollableScrollPhysics(),
-      itemCount: displayDocs.length,
-      separatorBuilder: (_, __) => Divider(
-        color: Colors.grey.withOpacity(0.15),
-        height: 1,
-        indent: 44,
-      ),
-      itemBuilder: (context, index) {
-        return _buildShoppingItem(context, displayDocs[index], index);
-      },
+  Widget _buildShoppingList(BuildContext context, List displayDocs, ColorScheme cs) {
+    return Column(
+      children: displayDocs.asMap().entries.map((entry) {
+        return _buildShoppingItem(context, entry.value, cs);
+      }).toList(),
     );
   }
 
-  Widget _buildShoppingItem(BuildContext context, dynamic doc, int index) {
+  Widget _buildShoppingItem(BuildContext context, dynamic doc, ColorScheme cs) {
     final data = doc.data();
-    final taskId = doc.id;
+    final itemId = doc.id;
 
     final title = data['title'] ?? 'No title';
-    final description = data['description'] ?? '';
     final status = data['status'] ?? 'pending';
     final isCompleted = status == 'completed';
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 10),
+      padding: const EdgeInsets.symmetric(vertical: 8),
       child: Row(
         children: [
           GestureDetector(
             onTap: () {
-              context.read<ShoppingItemProvider>().toggleShoppingItemStatus(taskId, status);
+              context.read<ShoppingItemProvider>().toggleShoppingItemStatus(itemId, status);
             },
             child: Icon(
-              isCompleted ? Icons.check_circle_rounded : Icons.pending_rounded,
-              color: isCompleted ? Colors.green.shade500 : Colors.amber.shade600,
-              size: 24,
+              isCompleted ? Icons.check_circle_rounded : Icons.radio_button_unchecked_rounded,
+              color: isCompleted ? Colors.green.shade500 : cs.secondary.withOpacity(0.4),
+              size: 22,
             ),
           ),
           const SizedBox(width: 12),
           Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  title,
-                  style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w500,
-                    color: isCompleted ? Colors.grey : Colors.black87,
-                    letterSpacing: -0.2,
-                  ),
-                ),
-                if (description.isNotEmpty) ...[
-                  const SizedBox(height: 1),
-                  Text(
-                    description,
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 11,
-                      color: Colors.grey.shade500,
-                    ),
-                  ),
-                ],
-              ],
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+                color: isCompleted ? cs.onSurface.withOpacity(0.4) : cs.onSurface,
+                decoration: isCompleted ? TextDecoration.lineThrough : null,
+              ),
             ),
-          ),
-          Icon(
-            Icons.chevron_right_rounded,
-            color: Colors.grey.shade300,
-            size: 18,
           ),
         ],
       ),

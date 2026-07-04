@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:smart_flat/core/screens/loading_screen.dart';
+import 'package:smart_flat/core/widgets/app_background.dart';
 import 'package:smart_flat/features/auth/providers/auth_provider.dart';
 import 'package:smart_flat/features/living_space/providers/living_space_provider.dart';
 import 'package:smart_flat/features/living_space/services/living_space_service.dart';
@@ -40,7 +41,7 @@ class _ShoppingItemsListScreenState extends State<ShoppingItemsListScreen> {
           setState(() {
             _memberNames = {
               for (var m in members)
-                m['createdBy']: m['firstName'] ?? m['userName'] ?? 'Użytkownik'
+                m['createdBy']: m['firstName'] ?? m['userName'] ?? 'User'
             };
             _isLoadingMembers = false;
           });
@@ -57,7 +58,7 @@ class _ShoppingItemsListScreenState extends State<ShoppingItemsListScreen> {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: const Text("Delete item"),
+        title: const Text("Delete Item"),
         content: const Text("Do you want to delete this item?"),
         actions: [
           TextButton(onPressed: () => Navigator.pop(context, false), child: const Text("Cancel")),
@@ -92,21 +93,24 @@ class _ShoppingItemsListScreenState extends State<ShoppingItemsListScreen> {
     final livingSpaceName = docs.first.data()['name'] ?? '';
 
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         title: Text(livingSpaceName, style: const TextStyle(fontWeight: FontWeight.bold, letterSpacing: -0.5)),
         centerTitle: true,
-        elevation: 0,
         backgroundColor: Colors.transparent,
       ),
-      body: (shoppingItemProvider.isLoading || _isLoadingMembers)
-          ? const Center(child: CircularProgressIndicator())
-          : Column(
-              children: [
-                _buildFilterBar(),
-                Expanded(child: _buildShoppingItemsList(context, shoppingItemProvider)),
-              ],
-            ),
+      extendBodyBehindAppBar: true,
+      body: AppBackground(
+        child: SafeArea(
+          child: (shoppingItemProvider.isLoading || _isLoadingMembers)
+              ? const Center(child: CircularProgressIndicator())
+              : Column(
+                  children: [
+                    _buildFilterBar(),
+                    Expanded(child: _buildShoppingItemsList(context, shoppingItemProvider)),
+                  ],
+                ),
+        ),
+      ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => context.push('/shopping-items/create'),
         backgroundColor: Theme.of(context).colorScheme.primary,
@@ -140,13 +144,14 @@ class _ShoppingItemsListScreenState extends State<ShoppingItemsListScreen> {
             onSelected: (_) => setState(() => _statusFilter = 'completed'),
           ),
           const SizedBox(width: 16),
-          Container(width: 1, height: 24, color: Colors.grey[300]),
+          Container(width: 1, height: 24, color: Colors.grey.withOpacity(0.3)),
           const SizedBox(width: 16),
 
           DropdownButton<String?>(
             value: _memberFilter,
             hint: const Text("Filter members", style: TextStyle(fontSize: 14)),
             underline: const SizedBox(),
+            dropdownColor: Colors.white,
             items: [
               const DropdownMenuItem(value: null, child: Text("Everyone")),
               ..._memberNames.entries.map((e) => DropdownMenuItem(
@@ -189,26 +194,15 @@ class _ShoppingItemsListScreenState extends State<ShoppingItemsListScreen> {
         final doc = filteredDocs[index];
         final data = doc.data();
         final shoppingItemId = doc.id;
-        final title = data['title'] ?? 'Bez tytułu';
+        final title = data['title'] ?? 'No title';
         final description = data['description'] ?? '';
         final assignedTo = data['assignedTo'];
         final status = data['status'] ?? 'pending';
         final isCompleted = status == 'completed';
-        final assignedName = _memberNames[assignedTo] ?? 'Nieprzypisane';
+        final assignedName = _memberNames[assignedTo] ?? 'Unassigned';
 
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: Colors.grey.withOpacity(0.15)),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.02),
-                blurRadius: 10,
-                offset: const Offset(0, 4),
-              ),
-            ],
-          ),
+        return Card(
+          color: Colors.white.withOpacity(0.8),
           child: Padding(
             padding: const EdgeInsets.all(16.0),
             child: Row(
@@ -248,7 +242,7 @@ class _ShoppingItemsListScreenState extends State<ShoppingItemsListScreen> {
                               text: assignedName,
                               style: TextStyle(
                                 fontSize: 13,
-                                color: Colors.blue.shade600,
+                                color: Theme.of(context).colorScheme.secondary,
                                 fontWeight: FontWeight.w600,
                                 decoration: TextDecoration.none,
                               ),
@@ -305,9 +299,9 @@ class _ShoppingItemsListScreenState extends State<ShoppingItemsListScreen> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(Icons.assignment_turned_in_outlined, size: 64, color: Colors.grey[300]),
+          Icon(Icons.shopping_cart_outlined, size: 64, color: Colors.grey.withOpacity(0.5)),
           const SizedBox(height: 16),
-          Text(message, style: const TextStyle(color: Colors.grey, fontSize: 16)),
+          Text(message, style: TextStyle(color: Colors.grey[600], fontSize: 16)),
         ],
       ),
     );
@@ -327,24 +321,26 @@ class _FilterChip extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
     return FilterChip(
       label: Text(label),
       selected: isSelected,
       onSelected: onSelected,
-      backgroundColor: Colors.white,
-      selectedColor: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-      checkmarkColor: Theme.of(context).colorScheme.primary,
+      backgroundColor: Colors.white.withOpacity(0.5),
+      selectedColor: cs.primary.withOpacity(0.2),
+      checkmarkColor: cs.primary,
       labelStyle: TextStyle(
-        color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey[700],
+        color: isSelected ? cs.primary : Colors.grey[700],
         fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
         fontSize: 13,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
         side: BorderSide(
-          color: isSelected ? Theme.of(context).colorScheme.primary : Colors.grey[300]!,
+          color: isSelected ? cs.primary : Colors.grey.withOpacity(0.2),
         ),
       ),
     );
   }
 }
+

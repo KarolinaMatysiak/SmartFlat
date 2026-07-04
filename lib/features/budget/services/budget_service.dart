@@ -86,7 +86,7 @@ class BudgetService {
     batch.set(historyRef, {
       'livingSpaceId': livingSpaceId,
       'createdBy': createdBy,
-      'createdAt': Timestamp.now(), // Używamy Timestamp.now() zamiast serverTimestamp()
+      'createdAt': Timestamp.now(), // We use Timestamp.now() instead of serverTimestamp()
       'title': title,
       'amount': amount,
       'type': type,

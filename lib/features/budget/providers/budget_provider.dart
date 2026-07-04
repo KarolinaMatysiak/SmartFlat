@@ -55,7 +55,7 @@ class BudgetProvider extends ChangeNotifier {
     _budgetSubscription?.cancel();
     _budgetHistorySubscription?.cancel();
     
-    // Ustawiamy ładowanie tylko jeśli nie mamy jeszcze żadnych danych
+    // Set loading only if we don't have any data yet
     if (_budgetSnapshot == null) _isLoadingBudget = true;
     if (_budgetHistorySnapshot == null) _isLoadingBudgetHistory = true;
     notifyListeners();
@@ -100,9 +100,9 @@ class BudgetProvider extends ChangeNotifier {
       amount: amount,
       type: type,
     );
-    // Po dodaniu operacji nie musimy robić nic więcej, 
-    // bo stream powinien sam dostarczyć dane, ale upewnijmy się, 
-    // że notifyListeners zostanie wywołane jeśli snapshoty się zmienią.
+    // After adding an operation we don't need to do anything else,
+    // because the stream should deliver the data itself, but let's make sure
+    // that notifyListeners will be called if the snapshots change.
   }
 
   @override

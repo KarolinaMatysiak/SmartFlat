@@ -10,34 +10,22 @@ class BudgetOverviewWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final budgetProvider = context.watch<BudgetProvider>();
+    final cs = Theme.of(context).colorScheme;
 
-    return SizedBox(
-      width: double.infinity,
-      child: Card(
-        margin: EdgeInsets.zero,
-        elevation: 0,
-        color: Colors.white,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(28),
-          side: BorderSide(
-            color: Colors.grey.withOpacity(0.15),
-            width: 1,
-          ),
-        ),
-        shadowColor: Colors.black.withOpacity(0.04),
-        child: InkWell(
-          borderRadius: BorderRadius.circular(28),
-          onTap: () => context.push('/budget'),
-          child: Padding(
-            padding: const EdgeInsets.all(20.0),
-            child: _buildContent(context, budgetProvider),
-          ),
+    return Card(
+      color: Colors.white.withOpacity(0.8),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(16),
+        onTap: () => context.push('/budget'),
+        child: Padding(
+          padding: const EdgeInsets.all(20.0),
+          child: _buildContent(context, budgetProvider, cs),
         ),
       ),
     );
   }
 
-  Widget _buildContent(BuildContext context, BudgetProvider budgetProvider) {
+  Widget _buildContent(BuildContext context, BudgetProvider budgetProvider, ColorScheme cs) {
     if (budgetProvider.isLoadingBudget) {
       return const Padding(
         padding: EdgeInsets.symmetric(vertical: 20),
@@ -56,44 +44,57 @@ class BudgetOverviewWidget extends StatelessWidget {
       children: [
         Row(
           children: [
-            Icon(
-              Icons.account_balance_wallet_rounded,
-              color: Colors.green.shade600,
-              size: 22,
+            Container(
+              padding: const EdgeInsets.all(8),
+              decoration: BoxDecoration(
+                color: Colors.green.shade50,
+                borderRadius: BorderRadius.circular(10),
+              ),
+              child: Icon(
+                Icons.account_balance_wallet_rounded,
+                color: Colors.green.shade600,
+                size: 20,
+              ),
             ),
-            const SizedBox(width: 8),
-            const Text(
-              'Budget',
+            const SizedBox(width: 12),
+            Text(
+              'Space Budget',
               style: TextStyle(
                 fontSize: 18,
                 fontWeight: FontWeight.bold,
-                letterSpacing: -0.4,
+                color: cs.onSurface,
+              ),
+            ),
+            const Spacer(),
+            Icon(Icons.chevron_right_rounded, color: cs.onSurface.withOpacity(0.3)),
+          ],
+        ),
+        const SizedBox(height: 16),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.baseline,
+          textBaseline: TextBaseline.alphabetic,
+          children: [
+            Text(
+              amount.toStringAsFixed(2),
+              style: const TextStyle(
+                fontSize: 32,
+                fontWeight: FontWeight.w900,
+                color: Colors.black,
+              ),
+            ),
+            const SizedBox(width: 4),
+            Text(
+              'PLN',
+              style: TextStyle(
+                fontSize: 14,
+                fontWeight: FontWeight.w600,
+                color: cs.onSurface.withOpacity(0.5),
               ),
             ),
           ],
         ),
-        const SizedBox(height: 16),
-        RichText(
-          text: TextSpan(
-            style: const TextStyle(
-              fontSize: 16,
-              color: Colors.black87,
-              fontWeight: FontWeight.w500,
-            ),
-            children: [
-              const TextSpan(text: 'Budget Twojego space to '),
-              TextSpan(
-                text: amount.toStringAsFixed(2),
-                style: const TextStyle(
-                  fontSize: 24,
-                  fontWeight: FontWeight.w900,
-                  color: Colors.black,
-                ),
-              ),
-            ],
-          ),
-        ),
       ],
     );
   }
+
 }
